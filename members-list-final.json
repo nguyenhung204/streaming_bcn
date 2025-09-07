@@ -1,0 +1,957 @@
+[
+  {
+    "fullName": "Bùi Công Tiển",
+    "studentId": "25702651",
+    "birthDate": "150807"
+  },
+  {
+    "fullName": "Bùi Minh Luân",
+    "studentId": "25643931",
+    "birthDate": "310107"
+  },
+  {
+    "fullName": "Bùi Tấn Hưng",
+    "studentId": "25662771",
+    "birthDate": "311007"
+  },
+  {
+    "fullName": "Bùi Trung Hiếu",
+    "studentId": "25666571",
+    "birthDate": "130107"
+  },
+  {
+    "fullName": "cao kiều trọng phúc",
+    "studentId": "25638731",
+    "birthDate": "100907"
+  },
+  {
+    "fullName": "Diệp Đình Hiếu",
+    "studentId": "25695111",
+    "birthDate": "270707"
+  },
+  {
+    "fullName": "Dương Gia Huy",
+    "studentId": "25630541",
+    "birthDate": "030407"
+  },
+  {
+    "fullName": "Dương Trọng Lễ",
+    "studentId": "25639617",
+    "birthDate": "250907"
+  },
+  {
+    "fullName": "Đào Duy Nguyên",
+    "studentId": "25736351",
+    "birthDate": "060407"
+  },
+  {
+    "fullName": "Đào Thái Bình An",
+    "studentId": "25645831",
+    "birthDate": "090207"
+  },
+  {
+    "fullName": "Đào Thị Anh Thư",
+    "studentId": "25687211",
+    "birthDate": "090607"
+  },
+  {
+    "fullName": "Đặng Thành Khôi",
+    "studentId": "25655031",
+    "birthDate": "090107"
+  },
+  {
+    "fullName": "Đặng Tuấn Khang",
+    "studentId": "25632861",
+    "birthDate": "240407"
+  },
+  {
+    "fullName": "Đinh Gia Phú",
+    "studentId": "25647851",
+    "birthDate": "190707"
+  },
+  {
+    "fullName": "Đinh Tấn Thành",
+    "studentId": "25631701",
+    "birthDate": "070107"
+  },
+  {
+    "fullName": "Đinh Thị Hoàng Mai",
+    "studentId": "25630681",
+    "birthDate": "270307"
+  },
+  {
+    "fullName": "ĐOÀN QUỐC ĐẠT",
+    "studentId": "25697401",
+    "birthDate": "080307"
+  },
+  {
+    "fullName": "Đoàn Thanh Huy",
+    "studentId": "25659961",
+    "birthDate": "291207"
+  },
+  {
+    "fullName": "Đỗ Đình Phong",
+    "studentId": "25721361",
+    "birthDate": "150307"
+  },
+  {
+    "fullName": "Đỗ Nguyễn Quốc Thịnh",
+    "studentId": "25725181",
+    "birthDate": "121007"
+  },
+  {
+    "fullName": "Đỗ Quốc Vinh",
+    "studentId": "25721341",
+    "birthDate": "200106"
+  },
+  {
+    "fullName": "Giang Bảo Dung",
+    "studentId": "25690051",
+    "birthDate": "120507"
+  },
+  {
+    "fullName": "Hà Thế Vinh",
+    "studentId": "25670181",
+    "birthDate": "220507"
+  },
+  {
+    "fullName": "Hà Thị Huyền Trân",
+    "studentId": "25727291",
+    "birthDate": "280907"
+  },
+  {
+    "fullName": "Hoàng Dương Thanh",
+    "studentId": "25723321",
+    "birthDate": "230807"
+  },
+  {
+    "fullName": "Hoàng Nguyễn Khánh Huyền",
+    "studentId": "25654151",
+    "birthDate": "201007"
+  },
+  {
+    "fullName": "Hồ Nhật Trường",
+    "studentId": "25736591",
+    "birthDate": "020207"
+  },
+  {
+    "fullName": "Hồ Thiên Trường",
+    "studentId": "25756211",
+    "birthDate": "030707"
+  },
+  {
+    "fullName": "Hồ Triệu Hoàng",
+    "studentId": "25716401",
+    "birthDate": "031207"
+  },
+  {
+    "fullName": "Hồ Trương Minh Quân",
+    "studentId": "25663271",
+    "birthDate": "221207"
+  },
+  {
+    "fullName": "Huỳnh Gia Thịnh",
+    "studentId": "25715291",
+    "birthDate": "161207"
+  },
+  {
+    "fullName": "Huỳnh Giao",
+    "studentId": "25680941",
+    "birthDate": "270107"
+  },
+  {
+    "fullName": "Huỳnh Hồng Thảo Hiếu",
+    "studentId": "25683621",
+    "birthDate": "020607"
+  },
+  {
+    "fullName": "Huỳnh Nguyễn Quỳnh Chi",
+    "studentId": "25666301",
+    "birthDate": "230307"
+  },
+  {
+    "fullName": "Huỳnh Phúc Lợi",
+    "studentId": "25730521",
+    "birthDate": "271007"
+  },
+  {
+    "fullName": "Huỳnh Thị Thúy Vy",
+    "studentId": "25744511",
+    "birthDate": "240407"
+  },
+  {
+    "fullName": "Huỳnh Trương Trọng Phúc",
+    "studentId": "25636031",
+    "birthDate": "071107"
+  },
+  {
+    "fullName": "Kha Bảo Anh",
+    "studentId": "25668111",
+    "birthDate": "011007"
+  },
+  {
+    "fullName": "Kiều Quan Nhị",
+    "studentId": "25663841",
+    "birthDate": "030807"
+  },
+  {
+    "fullName": "Lâm Duy Khánh",
+    "studentId": "25686381",
+    "birthDate": "181207"
+  },
+  {
+    "fullName": "Lâm Gia Hưnh",
+    "studentId": "25663471",
+    "birthDate": "220907"
+  },
+  {
+    "fullName": "Lê Bá Gia Bình",
+    "studentId": "25655221",
+    "birthDate": "220507"
+  },
+  {
+    "fullName": "Lê Hiếu Nghĩa",
+    "studentId": "25727211",
+    "birthDate": "030907"
+  },
+  {
+    "fullName": "Lê Hồng Cường",
+    "studentId": "25709981",
+    "birthDate": "050507"
+  },
+  {
+    "fullName": "Lê Hữu Lợi",
+    "studentId": "25704231",
+    "birthDate": "280907"
+  },
+  {
+    "fullName": "Lê Khánh Đăng",
+    "studentId": "25738141",
+    "birthDate": "181207"
+  },
+  {
+    "fullName": "Lê Minh Hoàng",
+    "studentId": "25680851",
+    "birthDate": "080707"
+  },
+  {
+    "fullName": "Lê Minh Khang",
+    "studentId": "25717181",
+    "birthDate": "080907"
+  },
+  {
+    "fullName": "Lê Minh Trí",
+    "studentId": "25677181",
+    "birthDate": "180907"
+  },
+  {
+    "fullName": "Lê Nguyễn Hoàng Khang",
+    "studentId": "25733531",
+    "birthDate": "030207"
+  },
+  {
+    "fullName": "Lê Nhật Thịnh",
+    "studentId": "25760351",
+    "birthDate": "041207"
+  },
+  {
+    "fullName": "Lê Nhật Trường",
+    "studentId": "25689001",
+    "birthDate": "240407"
+  },
+  {
+    "fullName": "Lê Phạm Mỹ Hường",
+    "studentId": "25655161",
+    "birthDate": "161007"
+  },
+  {
+    "fullName": "Lê Phương Quỳnh",
+    "studentId": "25700451",
+    "birthDate": "070907"
+  },
+  {
+    "fullName": "Lê Phương Thiện",
+    "studentId": "25711771",
+    "birthDate": "130407"
+  },
+  {
+    "fullName": "Lê Quang Thịnh",
+    "studentId": "25654411",
+    "birthDate": "020407"
+  },
+  {
+    "fullName": "Lê Tấn Dũng",
+    "studentId": "25664631",
+    "birthDate": "240207"
+  },
+  {
+    "fullName": "Lê Thành Nhân",
+    "studentId": "25643041",
+    "birthDate": "101107"
+  },
+  {
+    "fullName": "Lê Trần Tân",
+    "studentId": "25742701",
+    "birthDate": "060307"
+  },
+  {
+    "fullName": "Lê Trương Thảo Nhi",
+    "studentId": "25702981",
+    "birthDate": "191107"
+  },
+  {
+    "fullName": "Lê Tuấn Khanh",
+    "studentId": "25688551",
+    "birthDate": "040107"
+  },
+  {
+    "fullName": "Lê Vũ Duy",
+    "studentId": "25716801",
+    "birthDate": "260307"
+  },
+  {
+    "fullName": "Lê Yến Nhi",
+    "studentId": "25675581",
+    "birthDate": "141107"
+  },
+  {
+    "fullName": "Lưu Khả Tú",
+    "studentId": "25630831",
+    "birthDate": "260907"
+  },
+  {
+    "fullName": "Lý Anh Huy",
+    "studentId": "25651221",
+    "birthDate": "050907"
+  },
+  {
+    "fullName": "Lý Đặng Minh Kiên",
+    "studentId": "25698071",
+    "birthDate": "120807"
+  },
+  {
+    "fullName": "Mai Ngọc Việt",
+    "studentId": "25635421",
+    "birthDate": "050407"
+  },
+  {
+    "fullName": "Mai Thị Yến Nhi",
+    "studentId": "25753251",
+    "birthDate": "190307"
+  },
+  {
+    "fullName": "Ngô Gia Bảo",
+    "studentId": "25726751",
+    "birthDate": "101207"
+  },
+  {
+    "fullName": "Ngô Nguyễn Ngọc Như",
+    "studentId": "25662021",
+    "birthDate": "160807"
+  },
+  {
+    "fullName": "Ngô Văn Quân",
+    "studentId": "25648131",
+    "birthDate": "270207"
+  },
+  {
+    "fullName": "Nguyễn Anh Chương",
+    "studentId": "25695821",
+    "birthDate": "050107"
+  },
+  {
+    "fullName": "Nguyễn Anh Tài",
+    "studentId": "25636041",
+    "birthDate": "020107"
+  },
+  {
+    "fullName": "Nguyễn Bảo Trinh",
+    "studentId": "25704571",
+    "birthDate": "160404"
+  },
+  {
+    "fullName": "Nguyễn Bình Thanh Tâm",
+    "studentId": "25630931",
+    "birthDate": "250107"
+  },
+  {
+    "fullName": "Nguyễn Chi Quốc Vinh",
+    "studentId": "25641681",
+    "birthDate": "030407"
+  },
+  {
+    "fullName": "Nguyễn Chí Thanh",
+    "studentId": "25689521",
+    "birthDate": "130707"
+  },
+  {
+    "fullName": "Nguyễn Doãn Sang",
+    "studentId": "25630021",
+    "birthDate": "250407"
+  },
+  {
+    "fullName": "Nguyễn Đắc Huy",
+    "studentId": "25758421",
+    "birthDate": "310507"
+  },
+  {
+    "fullName": "Nguyễn Đăng Dương",
+    "studentId": "25633101",
+    "birthDate": "090207"
+  },
+  {
+    "fullName": "Nguyễn Đặng Hoàng Khôi",
+    "studentId": "25663551",
+    "birthDate": "050107"
+  },
+  {
+    "fullName": "Nguyễn Đức Tiến",
+    "studentId": "25733741",
+    "birthDate": "300907"
+  },
+  {
+    "fullName": "Nguyễn Hoàng Gia Phúc",
+    "studentId": "25721691",
+    "birthDate": "080207"
+  },
+  {
+    "fullName": "nguyễn hoàng Phúc",
+    "studentId": "25641481",
+    "birthDate": "050107"
+  },
+  {
+    "fullName": "Nguyễn Hồ Anh Thoại",
+    "studentId": "25756421",
+    "birthDate": "270307"
+  },
+  {
+    "fullName": "Nguyễn Hồng Cẩm Tú",
+    "studentId": "25661811",
+    "birthDate": "161207"
+  },
+  {
+    "fullName": "Nguyễn Hữu Lộc",
+    "studentId": "25654871",
+    "birthDate": "190107"
+  },
+  {
+    "fullName": "Nguyễn Hữu Luân",
+    "studentId": "25684831",
+    "birthDate": "101107"
+  },
+  {
+    "fullName": "Nguyễn Hữu y",
+    "studentId": "24730511",
+    "birthDate": "261207"
+  },
+  {
+    "fullName": "Nguyễn Khắc tường",
+    "studentId": "25706291",
+    "birthDate": "110207"
+  },
+  {
+    "fullName": "Nguyễn La Xuân Ca",
+    "studentId": "25742101",
+    "birthDate": "080307"
+  },
+  {
+    "fullName": "Nguyễn Lê Thanh Hiền",
+    "studentId": "25720721",
+    "birthDate": "261207"
+  },
+  {
+    "fullName": "Nguyễn Minh Khôi",
+    "studentId": "25686401",
+    "birthDate": "180607"
+  },
+  {
+    "fullName": "Nguyễn Ngọc Anh Thư",
+    "studentId": "25693971",
+    "birthDate": "300507"
+  },
+  {
+    "fullName": "Nguyễn Ngọc Khánh Vy",
+    "studentId": "25664681",
+    "birthDate": "141107"
+  },
+  {
+    "fullName": "Nguyễn Ngọc Thái",
+    "studentId": "25655491",
+    "birthDate": "280907"
+  },
+  {
+    "fullName": "Nguyễn Ngọc Tuấn Anh",
+    "studentId": "25647521",
+    "birthDate": "110907"
+  },
+  {
+    "fullName": "Nguyễn Nữ Hồng Đào",
+    "studentId": "25659811",
+    "birthDate": "191007"
+  },
+  {
+    "fullName": "Nguyễn Phan Hoài Linh",
+    "studentId": "25752051",
+    "birthDate": "010307"
+  },
+  {
+    "fullName": "Nguyễn Phú Điền",
+    "studentId": "25697421",
+    "birthDate": "010407"
+  },
+  {
+    "fullName": "Nguyễn Phúc Điền",
+    "studentId": "25708791",
+    "birthDate": "130807"
+  },
+  {
+    "fullName": "Nguyễn Quang",
+    "studentId": "25677271",
+    "birthDate": "240807"
+  },
+  {
+    "fullName": "Nguyễn Quang Thịnh",
+    "studentId": "25652931",
+    "birthDate": "011207"
+  },
+  {
+    "fullName": "Nguyễn Quốc Quỳnh",
+    "studentId": "25664401",
+    "birthDate": "170407"
+  },
+  {
+    "fullName": "Nguyễn Tấn Đoan",
+    "studentId": "25001865",
+    "birthDate": "180907"
+  },
+  {
+    "fullName": "Nguyễn Thành Đạt",
+    "studentId": "25634661",
+    "birthDate": "090907"
+  },
+  {
+    "fullName": "Nguyễn Thanh Hải",
+    "studentId": "25717251",
+    "birthDate": "231007"
+  },
+  {
+    "fullName": "Nguyễn Thanh Khang",
+    "studentId": "25650271",
+    "birthDate": "091107"
+  },
+  {
+    "fullName": "Nguyễn Thanh Phú",
+    "studentId": "25746291",
+    "birthDate": "270607"
+  },
+  {
+    "fullName": "Nguyễn Thành Trương",
+    "studentId": "25754701",
+    "birthDate": "031207"
+  },
+  {
+    "fullName": "Nguyễn Thị Anh Thư",
+    "studentId": "25744991",
+    "birthDate": "290907"
+  },
+  {
+    "fullName": "Nguyễn Thị Hoàng Yến",
+    "studentId": "25633211",
+    "birthDate": "150407"
+  },
+  {
+    "fullName": "Nguyễn Thị Kim Ngân",
+    "studentId": "25634161",
+    "birthDate": "050807"
+  },
+  {
+    "fullName": "Nguyễn Thị Minh Thư",
+    "studentId": "25644301",
+    "birthDate": "130707"
+  },
+  {
+    "fullName": "Nguyễn Thị Mỹ Duyên",
+    "studentId": "25717711",
+    "birthDate": "220507"
+  },
+  {
+    "fullName": "Nguyễn Thị Thảo Vy",
+    "studentId": "25746591",
+    "birthDate": "050207"
+  },
+  {
+    "fullName": "Nguyễn Thị Tuyết Trân",
+    "studentId": "25691221",
+    "birthDate": "180707"
+  },
+  {
+    "fullName": "Nguyễn Thiện Nhân",
+    "studentId": "25665691",
+    "birthDate": "170207"
+  },
+  {
+    "fullName": "Nguyễn Tiến Dũng",
+    "studentId": "23650821",
+    "birthDate": "050405"
+  },
+  {
+    "fullName": "Nguyễn Trần Nhật Hùng",
+    "studentId": "25632441",
+    "birthDate": "180107"
+  },
+  {
+    "fullName": "Nguyễn Trần Quốc Hào",
+    "studentId": "25712511",
+    "birthDate": "181207"
+  },
+  {
+    "fullName": "Nguyễn Trí Toàn",
+    "studentId": "25660951",
+    "birthDate": "191103"
+  },
+  {
+    "fullName": "Nguyễn Trọng Nhân",
+    "studentId": "25633451",
+    "birthDate": "231107"
+  },
+  {
+    "fullName": "Nguyễn Tuấn Phúc",
+    "studentId": "25675921",
+    "birthDate": "031007"
+  },
+  {
+    "fullName": "Nguyễn Văn An",
+    "studentId": "25635981",
+    "birthDate": "150707"
+  },
+  {
+    "fullName": "Nguyễn Văn Bảo",
+    "studentId": "25732641",
+    "birthDate": "080707"
+  },
+  {
+    "fullName": "Nguyễn Văn Dinh",
+    "studentId": "25728941",
+    "birthDate": "100607"
+  },
+  {
+    "fullName": "nguyễn văn phú",
+    "studentId": "25656911",
+    "birthDate": "110207"
+  },
+  {
+    "fullName": "Nguyễn Văn Thành Sang",
+    "studentId": "25696871",
+    "birthDate": "081207"
+  },
+  {
+    "fullName": "Nguyễn Văn Thuận",
+    "studentId": "25659371",
+    "birthDate": "030207"
+  },
+  {
+    "fullName": "Nguyễn Văn znhaatj",
+    "studentId": "25645661",
+    "birthDate": "301007"
+  },
+  {
+    "fullName": "Nguyễn Vi Huyền Diệu",
+    "studentId": "25669531",
+    "birthDate": "130307"
+  },
+  {
+    "fullName": "Nguyễn Việt Hoàng",
+    "studentId": "23666161",
+    "birthDate": "250604"
+  },
+  {
+    "fullName": "Nguyễn Việt Hưng",
+    "studentId": "25679441",
+    "birthDate": "070707"
+  },
+  {
+    "fullName": "Nguyễn Võ Hoàng",
+    "studentId": "25654451",
+    "birthDate": "150107"
+  },
+  {
+    "fullName": "Phạm Khánh Hưng",
+    "studentId": "25754341",
+    "birthDate": "160107"
+  },
+  {
+    "fullName": "Phạm Minh Quân",
+    "studentId": "25632591",
+    "birthDate": "131107"
+  },
+  {
+    "fullName": "Phạm Quốc Huy Hoàng",
+    "studentId": "25667021",
+    "birthDate": "240807"
+  },
+  {
+    "fullName": "phạm thế anh",
+    "studentId": "25750501",
+    "birthDate": "070607"
+  },
+  {
+    "fullName": "Phạm Thị Quỳnh Hương",
+    "studentId": "25719041",
+    "birthDate": "011207"
+  },
+  {
+    "fullName": "Phạm Trần Nguyên Khang",
+    "studentId": "25694531",
+    "birthDate": "230107"
+  },
+  {
+    "fullName": "Phạm Tuấn Kiệt",
+    "studentId": "25730221",
+    "birthDate": "100507"
+  },
+  {
+    "fullName": "Phan Nhật Hoàng",
+    "studentId": "25630891",
+    "birthDate": "060807"
+  },
+  {
+    "fullName": "Phan Như Ngọc",
+    "studentId": "25660011",
+    "birthDate": "081207"
+  },
+  {
+    "fullName": "Phan Phú Lộc",
+    "studentId": "25747401",
+    "birthDate": "300507"
+  },
+  {
+    "fullName": "Phan Quốc Thái",
+    "studentId": "25690921",
+    "birthDate": "180907"
+  },
+  {
+    "fullName": "Phan Thanh Tú",
+    "studentId": "25689281",
+    "birthDate": "160107"
+  },
+  {
+    "fullName": "Phan Thị Bích Ngà",
+    "studentId": "25759141",
+    "birthDate": "161207"
+  },
+  {
+    "fullName": "Phan Trung Phú",
+    "studentId": "25673991",
+    "birthDate": "220207"
+  },
+  {
+    "fullName": "Phùng Minh Quang",
+    "studentId": "25710771",
+    "birthDate": "020607"
+  },
+  {
+    "fullName": "Tạ Nhật Triều",
+    "studentId": "25719771",
+    "birthDate": "101007"
+  },
+  {
+    "fullName": "Tài Hàn Uy",
+    "studentId": "25724941",
+    "birthDate": "120407"
+  },
+  {
+    "fullName": "Thái Trang Đăng Khoa",
+    "studentId": "25731061",
+    "birthDate": "130707"
+  },
+  {
+    "fullName": "Tống Hoàng Phước Sang",
+    "studentId": "25691521",
+    "birthDate": "141107"
+  },
+  {
+    "fullName": "Tống Minh Duy",
+    "studentId": "25647271",
+    "birthDate": "160707"
+  },
+  {
+    "fullName": "Trang Thanh Thanh",
+    "studentId": "25638901",
+    "birthDate": "190507"
+  },
+  {
+    "fullName": "Trần Dương Phúc Thiện",
+    "studentId": "25652501",
+    "birthDate": "110407"
+  },
+  {
+    "fullName": "Trần Dương Quốc Thắng",
+    "studentId": "25704351",
+    "birthDate": "190107"
+  },
+  {
+    "fullName": "Trần Đặng Bảo Bảo",
+    "studentId": "25631071",
+    "birthDate": "160907"
+  },
+  {
+    "fullName": "Trần Đăng Gia Bảo",
+    "studentId": "25652141",
+    "birthDate": "170707"
+  },
+  {
+    "fullName": "Trần Gia Tú",
+    "studentId": "25643391",
+    "birthDate": "061107"
+  },
+  {
+    "fullName": "Trần Khả Vy",
+    "studentId": "25678411",
+    "birthDate": "081107"
+  },
+  {
+    "fullName": "Trần Khánh Duy",
+    "studentId": "25750921",
+    "birthDate": "161107"
+  },
+  {
+    "fullName": "Trần Kinh Kha",
+    "studentId": "25699281",
+    "birthDate": "141007"
+  },
+  {
+    "fullName": "Trần Lê Gia Bảo",
+    "studentId": "25644031",
+    "birthDate": "210407"
+  },
+  {
+    "fullName": "Trần Lê Gia Long",
+    "studentId": "25750131",
+    "birthDate": "200307"
+  },
+  {
+    "fullName": "Trần Minh Hoàng",
+    "studentId": "25663651",
+    "birthDate": "081107"
+  },
+  {
+    "fullName": "Trần Minh Kha",
+    "studentId": "25722741",
+    "birthDate": "190207"
+  },
+  {
+    "fullName": "Trần Minh Phi",
+    "studentId": "25667601",
+    "birthDate": "100607"
+  },
+  {
+    "fullName": "Trần Minh Trung",
+    "studentId": "25657331",
+    "birthDate": "061107"
+  },
+  {
+    "fullName": "TRẦN NGUYÊN HẰNG",
+    "studentId": "25679531",
+    "birthDate": "311207"
+  },
+  {
+    "fullName": "Trần Nguyễn Huyền Trân",
+    "studentId": "25700361",
+    "birthDate": "240207"
+  },
+  {
+    "fullName": "Trần Phát",
+    "studentId": "25680561",
+    "birthDate": "150907"
+  },
+  {
+    "fullName": "Trần Phước Thành",
+    "studentId": "25641671",
+    "birthDate": "140607"
+  },
+  {
+    "fullName": "Trần Quốc Hoàng",
+    "studentId": "25675481",
+    "birthDate": "240107"
+  },
+  {
+    "fullName": "Trần Thiên Bảo",
+    "studentId": "25701971",
+    "birthDate": "081207"
+  },
+  {
+    "fullName": "Trần Thiện Nhân",
+    "studentId": "25698261",
+    "birthDate": "121007"
+  },
+  {
+    "fullName": "Triệu Huy Bình",
+    "studentId": "25697271",
+    "birthDate": "090107"
+  },
+  {
+    "fullName": "Trương Hoài Sang",
+    "studentId": "25675271",
+    "birthDate": "011207"
+  },
+  {
+    "fullName": "Trương Thị Ngọc Quỳnh",
+    "studentId": "25701401",
+    "birthDate": "251007"
+  },
+  {
+    "fullName": "Văn Bích Hà",
+    "studentId": "25694251",
+    "birthDate": "010807"
+  },
+  {
+    "fullName": "Võ Dương Quốc Trung",
+    "studentId": "25685941",
+    "birthDate": "251207"
+  },
+  {
+    "fullName": "Võ Gia Huy",
+    "studentId": "20000000",
+    "birthDate": "041007"
+  },
+  {
+    "fullName": "Võ Nguyễn Tuấn Ngọc",
+    "studentId": "25666151",
+    "birthDate": "061107"
+  },
+  {
+    "fullName": "Võ Trọng Nhân",
+    "studentId": "25646251",
+    "birthDate": "040207"
+  },
+  {
+    "fullName": "Vũ Đặng Trần Hoàng",
+    "studentId": "25681601",
+    "birthDate": "280707"
+  },
+  {
+    "fullName": "Vũ Hoàng Kiên",
+    "studentId": "25652621",
+    "birthDate": "120207"
+  },
+  {
+    "fullName": "Vũ Minh Chiến",
+    "studentId": "25743101",
+    "birthDate": "030207"
+  },
+  {
+    "fullName": "Vũ Ngọc Tường Vy",
+    "studentId": "25644411",
+    "birthDate": "130307"
+  },
+  {
+    "fullName": "Vũ Nhật Hào",
+    "studentId": "25726461",
+    "birthDate": "250307"
+  },
+  {
+    "fullName": "Vương Quốc Trí",
+    "studentId": "25689811",
+    "birthDate": "290107"
+  }
+]

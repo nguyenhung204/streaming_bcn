@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LiveStream Chat - High Performance</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d1b69 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+            height: 100vh;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header h1 {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .connection-status {
+            padding: 12px 20px;
+            border-radius: 25px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .connected {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        .disconnected {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #fff;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+        
+        input, button, select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4ecdc4;
+            box-shadow: 0 0 15px rgba(78, 205, 196, 0.3);
+        }
+        
+        button {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: 600;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(78, 205, 196, 0.3);
+        }
+        
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .auth-section {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 20px;
+        }
+        
+        .chat-container {
+            display: none;
+            flex-direction: column;
+            height: calc(100vh - 200px);
+        }
+        
+        .chat-messages {
+            flex: 1;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            margin-bottom: 20px;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 5px;
+            background: #333;
+        }
+        
+        .message-header {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 3px;
+        }
+        
+        .message-content {
+            word-wrap: break-word;
+        }
+        
+        .system-message {
+            background: #444;
+            font-style: italic;
+            color: #ccc;
+        }
+        
+        .message-input {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .message.own {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            margin-left: 20%;
+            text-align: right;
+        }
+        
+        .message.other {
+            background: rgba(255, 255, 255, 0.1);
+            margin-right: 20%;
+        }
+        
+        .message-header {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .message-content {
+            font-size: 16px;
+            line-height: 1.4;
+        }
+        
+        .message-time {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+        
+        .message-input {
+            display: flex;
+            gap: 15px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .message-input input {
+            flex: 1;
+            margin: 0;
+            border-radius: 25px;
+            padding: 15px 20px;
+        }
+        
+        .message-input button {
+            width: auto;
+            margin: 0;
+            padding: 15px 25px;
+            border-radius: 25px;
+            white-space: nowrap;
+        }
+        
+        .stats {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .stats h3 {
+            margin-bottom: 15px;
+            color: #4ecdc4;
+            font-size: 18px;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-value {
+            font-weight: 600;
+            color: #4ecdc4;
+        }
+        
+        .typing-indicator {
+            font-style: italic;
+            color: #888;
+            font-size: 14px;
+            margin: 10px 20px;
+            min-height: 20px;
+            animation: typing 1.5s infinite;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% { opacity: 1; }
+            30% { opacity: 0.5; }
+        }
+        
+        .performance-monitor {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            font-size: 12px;
+        }
+        
+        .performance-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                padding: 10px;
+            }
+            
+            .sidebar {
+                order: -1;
+                margin-bottom: 20px;
+            }
+            
+            .message {
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+        }
+
+        /* Room Management Buttons */
+        .room-management {
+            margin: 20px 0;
+            padding: 15px 0;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .room-management h4 {
+            margin-bottom: 15px;
+            color: #4ecdc4;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .room-management button {
+            width: 100%;
+            margin-bottom: 8px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .room-management button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .room-management button:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-content">
+            <div class="header">
+                <h1>� LiveStream Chat - High Performance</h1>
+                <p>✨ Message Buffer System với Batch Processing cho 500+ users</p>
+            </div>
+            
+            <div id="connectionStatus" class="connection-status disconnected">
+                <div class="status-dot"></div>
+                <span>❌ Chưa kết nối</span>
+            </div>
+            
+            <div id="loginForm" class="auth-section">
+                <h2>🔐 Đăng nhập vào hệ thống</h2>
+                
+                <div class="form-group">
+                    <label for="studentId">📚 Mã sinh viên:</label>
+                    <input type="text" id="studentId" placeholder="Nhập mã sinh viên của bạn" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="birthDate">🎂 Ngày sinh (DDMMYY):</label>
+                    <input type="text" id="birthDate" placeholder="Ví dụ: 150807" maxlength="6" required>
+                </div>
+                
+                <button onclick="loginUser()" id="loginButton">🚀 Đăng nhập</button>
+                
+                <div id="loginError" style="color: #ff6b6b; margin-top: 15px; display: none; padding: 10px; background: rgba(255, 107, 107, 0.1); border-radius: 8px;"></div>
+            </div>
+
+            <div id="chatJoinForm" class="auth-section" style="display: none;">
+                <h2>💬 Tham gia phòng chat</h2>
+                
+                <div id="userInfo" style="margin-bottom: 20px; padding: 20px; background: rgba(78, 205, 196, 0.1); border-radius: 10px; border: 1px solid rgba(78, 205, 196, 0.3);">
+                    <div style="margin-bottom: 8px;">👤 <strong id="userFullName"></strong></div>
+                    <div style="margin-bottom: 8px;">📚 Mã SV: <strong id="userStudentId"></strong></div>
+                    <div>🕐 Lần đăng nhập: <strong id="userLoginCount"></strong></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="roomId">🏠 Mã phòng:</label>
+                    <input type="text" id="roomId" value="test-room-001" placeholder="Nhập mã phòng">
+                </div>
+                
+                <button onclick="joinRoom()" id="joinRoomButton">🚀 Tham gia phòng chat</button>
+                
+                <button onclick="logout()" style="background: linear-gradient(45deg, #ff6b6b, #ee5a52); margin-top: 15px;">🚪 Đăng xuất</button>
+            </div>
+            
+            <div id="chatContainer" class="chat-container">
+                <div id="chatMessages" class="chat-messages"></div>
+                <div id="typingIndicator" class="typing-indicator"></div>
+                
+                <div class="message-input">
+                    <input type="text" id="messageInput" placeholder="Tham gia phòng để chat..." maxlength="500" disabled>
+                    <button onclick="sendMessage()" id="sendButton" disabled>📤 Gửi</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="sidebar">
+            <div class="performance-monitor">
+                <h4>⚡ Performance Monitor</h4>
+                <div class="performance-item">
+                    <span>Buffer Status:</span>
+                    <span id="bufferStatus" class="stat-value">-</span>
+                </div>
+                <div class="performance-item">
+                    <span>Pending Writes:</span>
+                    <span id="pendingWrites" class="stat-value">0</span>
+                </div>
+                <div class="performance-item">
+                    <span>Msg/sec:</span>
+                    <span id="msgPerSec" class="stat-value">0</span>
+                </div>
+            </div>
+            
+            <div class="stats">
+                <h3>📊 Thống kê phòng</h3>
+                <div class="stat-item">
+                    <span>👥 Người xem:</span>
+                    <span id="viewerCount" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>💬 Tin nhắn:</span>
+                    <span id="messageCount" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>⚡ Ping:</span>
+                    <span id="pingTime" class="stat-value">- ms</span>
+                </div>
+                <div class="stat-item">
+                    <span>🕐 Uptime:</span>
+                    <span id="uptime" class="stat-value">00:00</span>
+                </div>
+            </div>
+            
+            <button onclick="leaveRoom()" style="background: linear-gradient(45deg, #ff6b6b, #ee5a52);">🚪 Rời phòng</button>
+            <button onclick="clearMessages()" style="background: linear-gradient(45deg, #ffa726, #ff9800); margin-top: 10px;">🗑️ Xóa tin nhắn</button>
+            <button onclick="getBufferStats()" style="background: linear-gradient(45deg, #9c27b0, #8e24aa); margin-top: 10px;">📊 Buffer Stats</button>
+            
+            <div class="room-management">
+                <h4>🏠 Quản lý phòng</h4>
+                <button onclick="showCreateRoomForm()" style="background: linear-gradient(45deg, #4CAF50, #45a049);">➕ Tạo phòng mới</button>
+                <button onclick="showRoomInfoDialog()" style="background: linear-gradient(45deg, #2196F3, #1976D2);">📋 Thông tin phòng</button>
+                <button onclick="loadRoomHistory()" style="background: linear-gradient(45deg, #FF9800, #F57C00);">📜 Lịch sử chat</button>
+                <button onclick="endCurrentRoom()" style="background: linear-gradient(45deg, #f44336, #d32f2f);">🔚 Kết thúc phòng</button>
+            </div>
+            
+            <div class="room-management">
+                <h4>🌐 Server</h4>
+                <button onclick="showServerStatsDialog()" style="background: linear-gradient(45deg, #9C27B0, #7B1FA2);">📊 Thống kê server</button>
+                <button onclick="checkServerHealth()" style="background: linear-gradient(45deg, #607D8B, #455A64);">💓 Kiểm tra sức khỏe</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        let socket = null;
+        let currentRoom = null;
+        let currentUser = null;
+        let authenticatedUser = null;
+        let messageCount = 0;
+        let typingTimer = null;
+        let pingInterval = null;
+        let startTime = null;
+        let messageRateCounter = 0;
+        let lastMessageTime = Date.now();
+
+        // Performance monitoring
+        let performanceStats = {
+            totalMessages: 0,
+            avgResponseTime: 0,
+            bufferSize: 0
+        };
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthenticationStatus();
+            setupEventListeners();
+            startPerformanceMonitoring();
+            
+            // Connect socket immediately for better UX
+            initializeSocket();
+        });
+
+        function setupEventListeners() {
+            // Message input Enter key
+            const messageInput = document.getElementById('messageInput');
+            if (messageInput) {
+                messageInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendMessage();
+                    }
+                });
+                
+                // Typing indicator
+                messageInput.addEventListener('input', function() {
+                    if (socket && currentRoom) {
+                        socket.emit('typing', { roomId: currentRoom, isTyping: true });
+                        
+                        clearTimeout(typingTimer);
+                        typingTimer = setTimeout(() => {
+                            socket.emit('typing', { roomId: currentRoom, isTyping: false });
+                        }, 2000);
+                    }
+                });
+            }
+            
+            // Login form Enter key
+            ['studentId', 'birthDate'].forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            loginUser();
+                        }
+                    });
+                }
+            });
+            
+            // Room ID Enter key
+            const roomInput = document.getElementById('roomId');
+            if (roomInput) {
+                roomInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        joinRoom();
+                    }
+                });
+            }
+        }
+
+        function startPerformanceMonitoring() {
+            setInterval(() => {
+                updateUptime();
+                updateMessageRate();
+            }, 1000);
+        }
+
+        function updateUptime() {
+            if (startTime) {
+                const now = Date.now();
+                const diff = Math.floor((now - startTime) / 1000);
+                const minutes = Math.floor(diff / 60);
+                const seconds = diff % 60;
+                document.getElementById('uptime').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }
+
+        function updateMessageRate() {
+            const now = Date.now();
+            if (now - lastMessageTime > 1000) {
+                document.getElementById('msgPerSec').textContent = messageRateCounter;
+                messageRateCounter = 0;
+                lastMessageTime = now;
+            }
+        }
+
+        function initializeSocket() {
+            if (socket) {
+                socket.disconnect();
+            }
+            
+            socket = io('/', {
+                transports: ['websocket', 'polling'],
+                upgrade: true,
+                rememberUpgrade: true
+            });
+
+            socket.on('connect', () => {
+                updateConnectionStatus(true, 'Kết nối thành công');
+                startPingMonitoring();
+                console.log('✅ Connected to server');
+            });
+
+            socket.on('disconnect', (reason) => {
+                updateConnectionStatus(false, `Mất kết nối: ${reason}`);
+                stopPingMonitoring();
+                console.log('❌ Disconnected:', reason);
+            });
+
+            socket.on('error', (error) => {
+                console.error('Socket error:', error);
+                updateConnectionStatus(false, `Lỗi: ${error.message}`);
+            });
+
+            // Chat events
+            socket.on('newMessage', (message) => {
+                displayMessage(message);
+                messageRateCounter++;
+                performanceStats.totalMessages++;
+            });
+
+            socket.on('userJoined', (data) => {
+                console.log('User joined:', data);
+                updateStats(data);
+                
+                // Enable message input when successfully joined
+                if (data.userId === currentUser?.userId) {
+                    const messageInput = document.getElementById('messageInput');
+                    const sendButton = document.getElementById('sendButton');
+                    
+                    messageInput.disabled = false;
+                    messageInput.placeholder = 'Nhập tin nhắn...';
+                    sendButton.disabled = false;
+                    
+                    console.log('✅ Message input enabled');
+                }
+            });
+
+            socket.on('userLeft', (data) => {
+                console.log('User left:', data);
+                updateStats(data);
+            });
+
+            socket.on('typing', (data) => {
+                updateTypingIndicator(data);
+            });
+
+            socket.on('roomStats', (stats) => {
+                updateStats(stats);
+            });
+
+            socket.on('pong', (timestamp) => {
+                const ping = Date.now() - timestamp;
+                document.getElementById('pingTime').textContent = ping + ' ms';
+                
+                // Update performance stats
+                performanceStats.avgResponseTime = ping;
+            });
+        }
+
+        async function checkAuthenticationStatus() {
+            try {
+                const response = await fetch('/auth/verify', {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+
+                const result = await response.json();
+                
+                if (result.valid && result.user) {
+                    authenticatedUser = result.user;
+                    showChatJoinForm();
+                    updateConnectionStatus(socket?.connected || false, 'Đã đăng nhập - Sẵn sàng tham gia phòng chat');
+                }
+            } catch (error) {
+                console.log('Not authenticated:', error);
+            }
+        }
+
+        async function loginUser() {
+            const studentId = document.getElementById('studentId').value.trim();
+            const birthDate = document.getElementById('birthDate').value.trim();
+            const loginButton = document.getElementById('loginButton');
+            const loginError = document.getElementById('loginError');
+
+            if (!studentId || !birthDate) {
+                showLoginError('⚠️ Vui lòng nhập đầy đủ mã sinh viên và ngày sinh');
+                return;
+            }
+
+            if (birthDate.length !== 6) {
+                showLoginError('⚠️ Ngày sinh phải có định dạng DDMMYY (6 số)');
+                return;
+            }
+
+            loginButton.disabled = true;
+            loginButton.textContent = '⏳ Đang đăng nhập...';
+            loginError.style.display = 'none';
+
+            try {
+                const response = await fetch('/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ studentId, birthDate }),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    authenticatedUser = result.user;
+                    showChatJoinForm();
+                    updateConnectionStatus(socket?.connected || false, '✅ Đăng nhập thành công');
+                } else {
+                    showLoginError('❌ ' + (result.message || 'Đăng nhập thất bại'));
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showLoginError('🔌 Lỗi kết nối server. Vui lòng thử lại.');
+            } finally {
+                loginButton.disabled = false;
+                loginButton.textContent = '🚀 Đăng nhập';
+            }
+        }
+
+        function showLoginError(message) {
+            const loginError = document.getElementById('loginError');
+            loginError.textContent = message;
+            loginError.style.display = 'block';
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                loginError.style.display = 'none';
+            }, 5000);
+        }
+
+        function showChatJoinForm() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('chatJoinForm').style.display = 'block';
+            
+            // Display user info with animation
+            document.getElementById('userFullName').textContent = authenticatedUser.fullName;
+            document.getElementById('userStudentId').textContent = authenticatedUser.studentId;
+            document.getElementById('userLoginCount').textContent = authenticatedUser.loginCount;
+            
+            // Focus on room input
+            setTimeout(() => {
+                document.getElementById('roomId').focus();
+            }, 100);
+        }
+
+        async function logout() {
+            try {
+                await fetch('/auth/logout', {
+                    method: 'POST',
+                    credentials: 'include',
+                });
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+            
+            // Reset all state
+            authenticatedUser = null;
+            currentUser = null;
+            currentRoom = null;
+            messageCount = 0;
+            startTime = null;
+            
+            // Disconnect socket
+            if (socket) {
+                socket.disconnect();
+            }
+            
+            // Reset UI
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('chatJoinForm').style.display = 'none';
+            document.getElementById('chatContainer').style.display = 'none';
+            
+            // Disable message input
+            const messageInput = document.getElementById('messageInput');
+            const sendButton = document.getElementById('sendButton');
+            
+            if (messageInput && sendButton) {
+                messageInput.disabled = true;
+                messageInput.placeholder = 'Tham gia phòng để chat...';
+                sendButton.disabled = true;
+            }
+            
+            // Clear forms
+            document.getElementById('studentId').value = '';
+            document.getElementById('birthDate').value = '';
+            document.getElementById('chatMessages').innerHTML = '';
+            
+            updateConnectionStatus(false, '🚪 Đã đăng xuất');
+        }
+
+        function joinRoom() {
+            if (!authenticatedUser) {
+                alert('⚠️ Vui lòng đăng nhập trước!');
+                return;
+            }
+
+            const roomId = document.getElementById('roomId').value.trim();
+            if (!roomId) {
+                alert('⚠️ Vui lòng nhập mã phòng!');
+                return;
+            }
+
+            const joinButton = document.getElementById('joinRoomButton');
+            joinButton.disabled = true;
+            joinButton.textContent = '⏳ Đang tham gia...';
+
+            currentRoom = roomId;
+            currentUser = {
+                userId: 'user_' + Math.random().toString(36).substr(2, 9),
+                username: authenticatedUser.fullName,
+                studentId: authenticatedUser.studentId
+            };
+
+            // Make sure socket is connected
+            if (!socket || !socket.connected) {
+                initializeSocket();
+                setTimeout(() => {
+                    socket.emit('joinRoom', { roomId, userId: currentUser.userId, username: currentUser.username });
+                }, 1000);
+            } else {
+                socket.emit('joinRoom', { roomId, userId: currentUser.userId, username: currentUser.username });
+            }
+
+            // Hide join form, show chat
+            document.getElementById('chatJoinForm').style.display = 'none';
+            document.getElementById('chatContainer').style.display = 'flex';
+            
+            // Enable message input (backup - will also be enabled by socket event)
+            setTimeout(() => {
+                const messageInput = document.getElementById('messageInput');
+                const sendButton = document.getElementById('sendButton');
+                
+                if (messageInput && sendButton) {
+                    messageInput.disabled = false;
+                    messageInput.placeholder = 'Nhập tin nhắn...';
+                    sendButton.disabled = false;
+                    messageInput.focus();
+                }
+            }, 1500);
+            
+            // Start timer
+            startTime = Date.now();
+            
+            joinButton.disabled = false;
+            joinButton.textContent = '🚀 Tham gia phòng chat';
+        }
+
+        function leaveRoom() {
+            if (socket && currentRoom && currentUser) {
+                socket.emit('leaveRoom', {
+                    roomId: currentRoom,
+                    userId: currentUser.userId
+                });
+            }
+
+            // Disable message input
+            const messageInput = document.getElementById('messageInput');
+            const sendButton = document.getElementById('sendButton');
+            
+            messageInput.disabled = true;
+            messageInput.placeholder = 'Tham gia phòng để chat...';
+            sendButton.disabled = true;
+
+            // Reset state
+            currentRoom = null;
+            currentUser = null;
+            messageCount = 0;
+            startTime = null;
+
+            // Reset UI
+            document.getElementById('chatJoinForm').style.display = 'block';
+            document.getElementById('chatContainer').style.display = 'none';
+            document.getElementById('chatMessages').innerHTML = '';
+            document.getElementById('typingIndicator').textContent = '';
+            
+            // Reset stats
+            document.getElementById('viewerCount').textContent = '0';
+            document.getElementById('messageCount').textContent = '0';
+            document.getElementById('uptime').textContent = '00:00';
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+
+            if (!message) {
+                return; // Silent return for empty messages
+            }
+            
+            if (!socket || !socket.connected) {
+                alert('🔌 Chưa kết nối! Vui lòng thử lại.');
+                return;
+            }
+            
+            if (!currentRoom || !currentUser) {
+                alert('⚠️ Bạn chưa tham gia phòng nào!');
+                return;
+            }
+
+            // Send message
+            socket.emit('sendMessage', {
+                message: message,
+                type: 'text'
+            });
+
+            messageInput.value = '';
+            messageRateCounter++;
+        }
+
+        function displayMessage(message) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageEl = document.createElement('div');
+            
+            const isOwnMessage = message.userId === currentUser?.userId;
+            messageEl.className = `message ${isOwnMessage ? 'own' : 'other'}`;
+            
+            const time = new Date(message.timestamp).toLocaleTimeString('vi-VN', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            messageEl.innerHTML = `
+                <div class="message-header">
+                    ${isOwnMessage ? 'Bạn' : message.username} 
+                </div>
+                <div class="message-content">${escapeHtml(message.message)}</div>
+                <div class="message-time">${time}</div>
+            `;
+            
+            messagesContainer.appendChild(messageEl);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Update message count
+            messageCount++;
+            document.getElementById('messageCount').textContent = messageCount;
+        }
+
+        function updateStats(data) {
+            if (data.viewerCount !== undefined) {
+                document.getElementById('viewerCount').textContent = data.viewerCount;
+            }
+            if (data.messageCount !== undefined) {
+                document.getElementById('messageCount').textContent = data.messageCount;
+            }
+        }
+
+        function updateTypingIndicator(data) {
+            const indicator = document.getElementById('typingIndicator');
+            
+            if (data.isTyping && data.userId !== currentUser?.userId) {
+                indicator.textContent = `💭 ${data.username} đang nhập...`;
+            } else {
+                indicator.textContent = '';
+            }
+        }
+
+        function updateConnectionStatus(connected, message) {
+            const statusEl = document.getElementById('connectionStatus');
+            const dotEl = statusEl.querySelector('.status-dot');
+            const textEl = statusEl.querySelector('span');
+            
+            statusEl.className = `connection-status ${connected ? 'connected' : 'disconnected'}`;
+            textEl.textContent = message;
+        }
+
+        function startPingMonitoring() {
+            if (pingInterval) return;
+            
+            pingInterval = setInterval(() => {
+                if (socket && socket.connected) {
+                    const start = Date.now();
+                    socket.emit('ping', start);
+                }
+            }, 5000);
+        }
+
+        function stopPingMonitoring() {
+            if (pingInterval) {
+                clearInterval(pingInterval);
+                pingInterval = null;
+            }
+        }
+
+        // Utility functions
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function clearMessages() {
+            if (confirm('🗑️ Xóa tất cả tin nhắn trong phòng?')) {
+                document.getElementById('chatMessages').innerHTML = '';
+                messageCount = 0;
+                document.getElementById('messageCount').textContent = '0';
+            }
+        }
+
+        async function getBufferStats() {
+            try {
+                const response = await fetch('/admin/buffer-stats');
+                const stats = await response.json();
+                
+                document.getElementById('bufferStatus').textContent = 
+                    stats.pendingWrites > 0 ? 'Buffering' : 'Synced';
+                document.getElementById('pendingWrites').textContent = stats.pendingWrites;
+                
+                console.log('📊 Buffer Stats:', stats);
+                alert(`📊 Buffer Stats:
+• Pending Writes: ${stats.pendingWrites}
+• Total Recent Messages: ${stats.totalRecentMessages}
+• Active Rooms: ${stats.activeRooms}
+• Flush Interval: ${stats.flushInterval}ms
+• Batch Size: ${stats.batchSize}`);
+            } catch (error) {
+                console.error('Error getting buffer stats:', error);
+                alert('❌ Không thể lấy thống kê buffer');
+            }
+        }
+
+        // ==================== ROOM MANAGEMENT APIs ====================
+
+        /**
+         * Create a new live room
+         */
+        async function createRoom(roomData) {
+            try {
+                const response = await fetch('/api/rooms', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(roomData),
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    console.log('✅ Room created successfully:', result.data);
+                    return result.data;
+                } else {
+                    console.error('❌ Failed to create room:', result.error);
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error('🔌 Network error creating room:', error);
+                throw error;
+            }
+        }
+
+        /**
+         * Get room information
+         */
+        async function getRoomInfo(roomId) {
+            try {
+                const response = await fetch(`/api/rooms/${roomId}`, {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    console.log('📋 Room info retrieved:', result.data);
+                    return result.data;
+                } else {
+                    console.error('❌ Failed to get room info:', result.error);
+                    return null;
+                }
+            } catch (error) {
+                console.error('🔌 Network error getting room info:', error);
+                return null;
+            }
+        }
+
+        /**
+         * Get room messages
+         */
+        async function getRoomMessages(roomId, limit = 100) {
+            try {
+                const response = await fetch(`/api/rooms/${roomId}/messages?limit=${limit}`, {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    console.log('💬 Room messages retrieved:', result.data.length, 'messages');
+                    return result.data;
+                } else {
+                    console.error('❌ Failed to get room messages:', result.error);
+                    return [];
+                }
+            } catch (error) {
+                console.error('🔌 Network error getting room messages:', error);
+                return [];
+            }
+        }
+
+        /**
+         * End a live room
+         */
+        async function endRoom(roomId) {
+            try {
+                const response = await fetch(`/api/rooms/${roomId}/end`, {
+                    method: 'POST',
+                    credentials: 'include',
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    console.log('🔚 Room ended successfully');
+                    return true;
+                } else {
+                    console.error('❌ Failed to end room:', result.error);
+                    return false;
+                }
+            } catch (error) {
+                console.error('🔌 Network error ending room:', error);
+                return false;
+            }
+        }
+
+        /**
+         * Get server statistics
+         */
+        async function getServerStats() {
+            try {
+                const response = await fetch('/api/stats', {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    console.log('📊 Server stats retrieved:', result.data);
+                    return result.data;
+                } else {
+                    console.error('❌ Failed to get server stats:', result.error);
+                    return null;
+                }
+            } catch (error) {
+                console.error('🔌 Network error getting server stats:', error);
+                return null;
+            }
+        }
+
+        /**
+         * Get health status
+         */
+        async function getHealthStatus() {
+            try {
+                const response = await fetch('/api/health', {
+                    method: 'GET',
+                });
+
+                const result = await response.json();
+                console.log('💓 Health status:', result);
+                return result;
+            } catch (error) {
+                console.error('🔌 Network error getting health status:', error);
+                return null;
+            }
+        }
+
+        // ==================== ROOM MANAGEMENT UI FUNCTIONS ====================
+
+        /**
+         * Show room creation form
+         */
+        function showCreateRoomForm() {
+            const roomId = prompt('🏠 Nhập Room ID (chỉ chữ, số, _, -):');
+            if (!roomId) return;
+
+            if (!/^[a-zA-Z0-9_-]+$/.test(roomId)) {
+                alert('❌ Room ID chỉ được chứa chữ cái, số, gạch dưới và gạch ngang');
+                return;
+            }
+
+            const title = prompt('📝 Nhập tiêu đề phòng:');
+            if (!title) return;
+
+            const description = prompt('📄 Nhập mô tả phòng (tùy chọn):') || '';
+
+            createRoomWithForm(roomId, title, description);
+        }
+
+        /**
+         * Create room with form data
+         */
+        async function createRoomWithForm(roomId, title, description = '') {
+            if (!authenticatedUser) {
+                alert('❌ Vui lòng đăng nhập trước khi tạo phòng');
+                return;
+            }
+
+            const roomData = {
+                roomId: roomId,
+                title: title,
+                hostId: authenticatedUser.studentId,
+                hostName: authenticatedUser.fullName,
+                description: description,
+                settings: {
+                    maxChatLength: 500,
+                    slowMode: 0,
+                    moderatorMode: false,
+                    allowGuests: true,
+                    category: 'general'
+                }
+            };
+
+            try {
+                const room = await createRoom(roomData);
+                alert(`✅ Tạo phòng thành công!\n🏠 Room ID: ${room.roomId}\n📝 Tiêu đề: ${room.title}`);
+                
+                // Auto join the created room
+                document.getElementById('roomId').value = roomId;
+                joinRoom();
+            } catch (error) {
+                alert(`❌ Không thể tạo phòng: ${error.message}`);
+            }
+        }
+
+        /**
+         * Show room info
+         */
+        async function showRoomInfoDialog() {
+            const roomId = document.getElementById('roomId').value.trim();
+            if (!roomId) {
+                alert('❌ Vui lòng nhập Room ID');
+                return;
+            }
+
+            const roomInfo = await getRoomInfo(roomId);
+            if (!roomInfo) {
+                alert('❌ Không tìm thấy phòng hoặc phòng không hoạt động');
+                return;
+            }
+
+            const info = `📋 THÔNG TIN PHÒNG
+
+🏠 Room ID: ${roomInfo.roomId}
+📝 Tiêu đề: ${roomInfo.title}
+👑 Host: ${roomInfo.hostName} (${roomInfo.hostId})
+👥 Người xem: ${roomInfo.viewerCount}
+📊 Trạng thái: ${roomInfo.isActive ? 'Đang hoạt động' : 'Đã kết thúc'}
+⏰ Bắt đầu: ${new Date(roomInfo.startTime).toLocaleString('vi-VN')}
+💬 Tin nhắn hiện tại: ${roomInfo.messageCount}
+👤 Người dùng hiện tại: ${roomInfo.currentUsers}
+
+⚙️ CÀI ĐẶT:
+• Độ dài tin nhắn tối đa: ${roomInfo.settings?.maxChatLength || 500}
+• Chế độ chậm: ${roomInfo.settings?.slowMode || 0}s
+• Chế độ kiểm duyệt: ${roomInfo.settings?.moderatorMode ? 'Bật' : 'Tắt'}
+• Cho phép khách: ${roomInfo.settings?.allowGuests ? 'Có' : 'Không'}`;
+
+            alert(info);
+        }
+
+        /**
+         * Show server statistics
+         */
+        async function showServerStatsDialog() {
+            const stats = await getServerStats();
+            if (!stats) {
+                alert('❌ Không thể lấy thống kê server');
+                return;
+            }
+
+            const info = `📊 THỐNG KÊ SERVER
+
+🏠 Tổng số phòng: ${stats.totalRooms}
+👥 Tổng người dùng: ${stats.totalUsers}
+⏰ Cập nhật lúc: ${new Date(stats.timestamp).toLocaleString('vi-VN')}
+
+📋 DANH SÁCH PHÒNG:
+${stats.rooms.map(room => 
+    `• ${room.roomId} (${room.userCount} người)`
+).join('\n')}`;
+
+            alert(info);
+        }
+
+        /**
+         * End current room (only for room host)
+         */
+        async function endCurrentRoom() {
+            const roomId = document.getElementById('roomId').value.trim();
+            if (!roomId) {
+                alert('❌ Không có phòng nào đang hoạt động');
+                return;
+            }
+
+            if (!authenticatedUser) {
+                alert('❌ Vui lòng đăng nhập');
+                return;
+            }
+
+            // Get room info to check if user is host
+            const roomInfo = await getRoomInfo(roomId);
+            if (!roomInfo) {
+                alert('❌ Không tìm thấy phòng');
+                return;
+            }
+
+            if (roomInfo.hostId !== authenticatedUser.studentId) {
+                alert('❌ Chỉ host mới có thể kết thúc phòng');
+                return;
+            }
+
+            if (!confirm(`🔚 Bạn có chắc muốn kết thúc phòng "${roomInfo.title}"?`)) {
+                return;
+            }
+
+            const success = await endRoom(roomId);
+            if (success) {
+                alert('✅ Kết thúc phòng thành công');
+                leaveRoom();
+            } else {
+                alert('❌ Không thể kết thúc phòng');
+            }
+        }
+
+        /**
+         * Load room messages history
+         */
+        async function loadRoomHistory() {
+            const roomId = document.getElementById('roomId').value.trim();
+            if (!roomId) {
+                alert('❌ Vui lòng nhập Room ID');
+                return;
+            }
+
+            const messages = await getRoomMessages(roomId, 50);
+            if (messages.length === 0) {
+                alert('📭 Phòng chưa có tin nhắn nào');
+                return;
+            }
+
+            // Clear current messages and load history
+            document.getElementById('chatMessages').innerHTML = '';
+            messageCount = 0;
+
+            messages.forEach(message => {
+                addMessage(message);
+            });
+
+            alert(`📜 Đã tải ${messages.length} tin nhắn gần nhất`);
+        }
+
+        /**
+         * Check server health
+         */
+        async function checkServerHealth() {
+            const health = await getHealthStatus();
+            if (!health) {
+                alert('❌ Không thể kiểm tra trạng thái server');
+                return;
+            }
+
+            const uptimeHours = Math.floor(health.uptime / 3600);
+            const uptimeMinutes = Math.floor((health.uptime % 3600) / 60);
+            const memoryUsed = Math.round(health.memory.heapUsed / 1024 / 1024);
+            const memoryTotal = Math.round(health.memory.heapTotal / 1024 / 1024);
+
+            const info = `💓 TRẠNG THÁI SERVER
+
+✅ Status: ${health.status}
+⏰ Uptime: ${uptimeHours}h ${uptimeMinutes}m
+🖥️ Memory: ${memoryUsed}MB / ${memoryTotal}MB
+📅 Thời gian: ${health.timestamp}
+🗃️ Session: ${health.session?.status || 'Unknown'}`;
+
+            alert(info);
+        }
+    </script>
+</body>
+</html>
