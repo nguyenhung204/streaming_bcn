@@ -3,8 +3,8 @@
 # Stage 1: Base stage
 FROM node:22-alpine AS base
 
-# Install dumb-init for proper signal handling
-RUN apk add --no-cache dumb-init
+# Install dumb-init, MongoDB tools, and netcat for proper signal handling and DB operations
+RUN apk add --no-cache dumb-init mongodb-tools netcat-openbsd
 
 # Set working directory
 WORKDIR /app
@@ -68,6 +68,11 @@ COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
 COPY --chown=nestjs:nodejs package.json ./
 COPY --chown=nestjs:nodejs public ./public
 COPY --chown=nestjs:nodejs members-list-final.json ./
+COPY --chown=nestjs:nodejs scripts/docker-setup.sh ./scripts/
+COPY --chown=nestjs:nodejs src ./src
+
+# Make setup script executable
+RUN chmod +x ./scripts/docker-setup.sh
 
 # Create logs directory
 RUN mkdir -p /app/logs && chown nestjs:nodejs /app/logs
@@ -91,5 +96,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]
 
-# Start the application
-CMD ["node", "dist/main.js"]
+# Start the application with setup
+CMD ["./scripts/docker-setup.sh", "node", "./dist/main.js"]

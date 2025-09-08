@@ -6,10 +6,12 @@ import { AppConfigService } from '../config/app-config.service';
 import { ChatService } from '../services/chat.service';
 import { MessageBufferService } from '../services/message-buffer.service';
 import { SessionManager } from '../services/session-manager.service';
+import { AdminService } from '../services/admin.service';
 import { ApiController } from '../controllers/api.controller';
 import { AdminController } from '../controllers/admin.controller';
 import { ChatMessage, ChatMessageSchema } from '../schemas/chat-message.schema';
 import { LiveRoom, LiveRoomSchema } from '../schemas/live-room.schema';
+import { User, UserSchema } from '../schemas/user.schema';
 import { AuthModule } from './auth.module';
 import { WsAuthMiddleware } from '../middleware/ws-auth.middleware';
 
@@ -20,6 +22,7 @@ import { WsAuthMiddleware } from '../middleware/ws-auth.middleware';
     MongooseModule.forFeature([
       { name: ChatMessage.name, schema: ChatMessageSchema },
       { name: LiveRoom.name, schema: LiveRoomSchema },
+      { name: User.name, schema: UserSchema },
     ]),
   ],
   controllers: [ApiController, AdminController],
@@ -28,6 +31,7 @@ import { WsAuthMiddleware } from '../middleware/ws-auth.middleware';
     ChatService,
     MessageBufferService,
     SessionManager,
+    AdminService,
     AppConfigService,
     WsAuthMiddleware,
   ],
@@ -35,6 +39,7 @@ import { WsAuthMiddleware } from '../middleware/ws-auth.middleware';
     ChatService,
     MessageBufferService,
     SessionManager,
+    AdminService,
   ],
 })
 export class ChatModule {}

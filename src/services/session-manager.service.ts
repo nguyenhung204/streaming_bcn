@@ -309,4 +309,80 @@ export class SessionManager {
       return [];
     }
   }
+
+  // Admin methods
+  async disconnectUser(userId: string): Promise<void> {
+    return ErrorHandler.handle(
+      async () => {
+        // Find socket by userId
+        for (const [socketId, session] of this.userSessions.entries()) {
+          if (session.userId === userId) {
+            await this.removeUserFromRoom(socketId);
+            this.logger.log(`Force disconnected user ${userId}`);
+            break;
+          }
+        }
+      },
+      {
+        logger: this.logger,
+        context: 'Error disconnecting user',
+      }
+    );
+  }
+
+  async getUserSession(userId: string): Promise<UserSession | null> {
+    try {
+      for (const session of this.userSessions.values()) {
+        if (session.userId === userId) {
+          return session;
+        }
+      }
+      return null;
+    } catch (error) {
+      this.logger.error(`Error getting user session: ${error.message}`);
+      return null;
+    }
+  }
+
+  async getUserSocketIds(userId: string): Promise<string[]> {
+    try {
+      const socketIds: string[] = [];
+      for (const [socketId, session] of this.userSessions.entries()) {
+        if (session.userId === userId) {
+          socketIds.push(socketId);
+        }
+      }
+      return socketIds;
+    } catch (error) {
+      this.logger.error(`Error getting user socket IDs: ${error.message}`);
+      return [];
+    }
+  }
+
+  async getTotalOnlineUsers(): Promise<number> {
+    try {
+      return this.userSessions.size;
+    } catch (error) {
+      this.logger.error(`Error getting online users count: ${error.message}`);
+      return 0;
+    }
+  }
+
+  async getActiveRoomsCount(): Promise<number> {
+    try {
+      return this.roomUsers.size;
+    } catch (error) {
+      this.logger.error(`Error getting active rooms count: ${error.message}`);
+      return 0;
+    }
+  }
+
+  async getAllOnlineSessions(): Promise<UserSession[]> {
+    try {
+      return Array.from(this.userSessions.values());
+    } catch (error) {
+      this.logger.error(`Error getting all online sessions: ${error.message}`);
+      return [];
+    }
+  }
 }

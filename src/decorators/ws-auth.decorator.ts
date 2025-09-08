@@ -1,5 +1,5 @@
 import { applyDecorators, UseGuards } from '@nestjs/common';
-import { WsJwtAuthGuard } from 'src/guards/ws-jwt-auth.guard';
+import { WsJwtAuthGuard } from '../guards/ws-jwt-auth.guard';
 
 /**
  * WebSocket Authentication Decorator

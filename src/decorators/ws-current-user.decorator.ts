@@ -5,6 +5,10 @@ export interface WsUser {
   studentId: string;
   fullName: string;
   userId: string;
+  isBanned?: boolean;
+  bannedReason?: string;
+  bannedAt?: Date;
+  bannedBy?: string;
   payload?: any;
 }
 

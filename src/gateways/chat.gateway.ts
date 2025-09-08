@@ -12,6 +12,7 @@ import { Logger, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from '../services/chat.service';
 import { SessionManager } from '../services/session-manager.service';
+import { AdminService } from '../services/admin.service';
 import { AppConfigService } from '../config/app-config.service';
 import {
   ChatMessageDto,
@@ -30,8 +31,8 @@ import { WsAuthMiddleware } from '../middleware/ws-auth.middleware';
   },
   transports: ['websocket'],
   allowEIO3: true,
-  pingTimeout: 60000, // Will be overridden in constructor
-  pingInterval: 25000, // Will be overridden in constructor
+  pingTimeout: 60000,
+  pingInterval: 25000, 
 })
 @UsePipes(new ValidationPipe())
 export class ChatGateway
@@ -47,6 +48,7 @@ export class ChatGateway
   constructor(
     private readonly chatService: ChatService,
     private readonly sessionManager: SessionManager,
+    private readonly adminService: AdminService,
     private readonly appConfig: AppConfigService,
     private readonly wsAuthMiddleware: WsAuthMiddleware,
   ) {
@@ -58,6 +60,9 @@ export class ChatGateway
 
   afterInit(server: Server) {
     this.logger.log('WebSocket Gateway initialized');
+    
+    // Set server instance for admin service to emit realtime events
+    this.adminService.setServer(server);
     
     // Apply authentication middleware to all socket connections
     server.use((socket, next) => {
@@ -78,6 +83,19 @@ export class ChatGateway
       // Check if user data exists
       if (!user) {
         this.logger.error(`No user data found for socket ${client.id}`);
+        client.disconnect();
+        return;
+      }
+
+      // Check if user is banned (realtime check from database)
+      const bannedStatus = await this.adminService.checkUserBannedStatus(user.studentId);
+      if (bannedStatus.isBanned) {
+        this.logger.warn(`Banned user attempted connection: ${user.studentId}`);
+        client.emit('error', { 
+          message: `Tài khoản bị khóa. Lý do: ${bannedStatus.bannedReason || 'Vi phạm quy định'}`,
+          code: 'USER_BANNED',
+          requireReconnect: false
+        });
         client.disconnect();
         return;
       }
@@ -247,6 +265,33 @@ export class ChatGateway
         return;
       }
 
+      // Check if user is banned (realtime check from database)
+      this.logger.debug(`Checking ban status before sending message for user: ${user.userId}`);
+      const bannedStatus = await this.adminService.checkUserBannedStatus(user.userId);
+      
+      this.logger.debug(`Ban status result for ${user.userId}:`, bannedStatus);
+      
+      if (bannedStatus.isBanned) {
+        this.logger.warn(`🚫 BANNED USER ATTEMPTED TO SEND MESSAGE: ${user.userId}`);
+        this.logger.warn(`Emitting user:banned event to client ${client.id}`);
+        
+        client.emit('user:banned', {
+          message: `Tài khoản bị khóa. Lý do: ${bannedStatus.bannedReason || 'Vi phạm quy định'}`,
+          reason: bannedStatus.bannedReason,
+          bannedBy: bannedStatus.bannedBy,
+          code: 'USER_BANNED',
+          requireDisconnect: true
+        });
+        
+        // Force disconnect user
+        await this.sessionManager.removeUserFromRoom(client.id);
+        client.disconnect();
+        return;
+      }
+      
+      // Log when user is NOT banned (should be normal flow)
+      this.logger.debug(`✅ User ${user.userId} is NOT banned, proceeding with message`);
+
       // Get user session with more detailed logging
       const userSession = await this.sessionManager.getUserBySocketId(client.id);
       if (!userSession) {
@@ -281,7 +326,7 @@ export class ChatGateway
         return; // Ignore empty messages silently for performance
       }
 
-      if (message.length > 500) {
+      if (message.length > 1000) {
         client.emit('error', { message: 'Message too long' });
         return;
       }
@@ -397,6 +442,26 @@ export class ChatGateway
       await this.sessionManager.removeTypingUser(roomId, userId);
     } catch (error) {
       this.logger.error(`Error removing user from typing: ${error.message}`);
+    }
+  }
+
+  // Admin method to disconnect specific user
+  async disconnectUserByUserId(userId: string): Promise<void> {
+    try {
+      // Find socket by userId and disconnect
+      for (const [socketId, client] of this.server.sockets.sockets) {
+        if (client.data.user?.studentId === userId) {
+          this.logger.log(`Admin disconnecting user ${userId} (socket: ${socketId})`);
+          client.emit('error', { 
+            message: 'Tài khoản đã bị khóa bởi admin',
+            code: 'BANNED_BY_ADMIN',
+            requireReconnect: false
+          });
+          client.disconnect();
+        }
+      }
+    } catch (error) {
+      this.logger.error(`Error disconnecting user ${userId}: ${error.message}`);
     }
   }
 }

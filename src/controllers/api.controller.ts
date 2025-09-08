@@ -29,6 +29,26 @@ export class ApiController {
     private readonly sessionManager: SessionManager,
   ) {}
 
+  @Get('dashboard')
+  getDashboard() {
+    // Serve the dashboard HTML file
+    return `
+      <script>
+        window.location.href = '/dashboard.html';
+      </script>
+    `;
+  }
+
+  @Get('admin')
+  getAdmin() {
+    // Short link to admin dashboard
+    return `
+      <script>
+        window.location.href = '/dashboard.html';
+      </script>
+    `;
+  }
+
   @Get('health')
   @HttpCode(HttpStatus.OK)
   async getHealth() {

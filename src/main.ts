@@ -37,11 +37,11 @@ async function bootstrap() {
   // Enable CORS
   app.enableCors({
     origin: [
+      'https://stream.bancongnghe.tech',
       'http://127.0.0.1:5500',
       'http://localhost:5500', 
       'http://localhost:3000',
       'http://localhost:3001',
-      'https://stream.bancongnghe.tech',
       configService.get('CORS_ORIGIN')
     ].filter(Boolean),
     credentials: true, // Important for cookies

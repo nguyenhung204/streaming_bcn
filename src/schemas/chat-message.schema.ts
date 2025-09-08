@@ -27,6 +27,12 @@ export class ChatMessage {
   @Prop({ default: false })
   isDeleted: boolean;
 
+  @Prop()
+  deletedAt?: Date;
+
+  @Prop()
+  deletedBy?: string;
+
   @Prop({ enum: ['text', 'emoji', 'system'], default: 'text' })
   type: string;
 }

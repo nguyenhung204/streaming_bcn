@@ -24,25 +24,6 @@ services:
       retries: 3
       start_period: 40s
 
-  data-import:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: production
-    container_name: livestream_import
-    depends_on:
-      mongodb:
-        condition: service_healthy
-    volumes:
-      - ./members-list-final.json:/app/members-list-final.json:ro
-    networks:
-      - app-network
-    environment:
-      - NODE_ENV=production
-      - MONGODB_URI=mongodb://${MONGODB_ROOT_USER:-admin}:${MONGODB_ROOT_PASSWORD:-admin123}@mongodb:27017/stream_socket?authSource=admin
-      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
-    command: ["node", "dist/scripts/import-members.js"]
-    restart: "no"
   # NestJS Application (Direct access without nginx)
   app:
     build:

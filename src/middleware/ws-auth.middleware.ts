@@ -37,6 +37,10 @@ export class WsAuthMiddleware {
         studentId: user.studentId,
         fullName: user.fullName,
         userId: user.studentId, // Using studentId as userId for consistency
+        isBanned: user.isBanned || false,
+        bannedReason: user.bannedReason,
+        bannedAt: user.bannedAt,
+        bannedBy: user.bannedBy,
         payload,
       };
 

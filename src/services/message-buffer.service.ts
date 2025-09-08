@@ -115,6 +115,36 @@ export class MessageBufferService {
   }
 
   /**
+   * Delete message from buffer (for admin)
+   */
+  deleteMessage(messageId: string, roomId: string): boolean {
+    let deleted = false;
+
+    // Remove from recent messages
+    const roomMessages = this.recentMessages.get(roomId);
+    if (roomMessages) {
+      const index = roomMessages.findIndex(msg => msg.id === messageId);
+      if (index !== -1) {
+        roomMessages.splice(index, 1);
+        deleted = true;
+      }
+    }
+
+    // Remove from pending writes
+    const pendingIndex = this.pendingWrites.findIndex(msg => msg.id === messageId);
+    if (pendingIndex !== -1) {
+      this.pendingWrites.splice(pendingIndex, 1);
+      deleted = true;
+    }
+
+    if (deleted) {
+      this.logger.log(`Message ${messageId} deleted from buffer`);
+    }
+
+    return deleted;
+  }
+
+  /**
    * Force flush all pending messages to database
    */
   async forceFlush(): Promise<void> {

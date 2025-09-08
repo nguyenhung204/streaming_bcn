@@ -46,6 +46,12 @@ export class AuthService {
         return null;
       }
 
+      // Check if user is banned
+      if (user.isBanned) {
+        this.logger.warn(`Banned user attempted login: ${studentId}`);
+        throw new UnauthorizedException(`Tài khoản bị khóa. Lý do: ${user.bannedReason || 'Vi phạm quy định'}`);
+      }
+
       const isPasswordValid = await bcrypt.compare(birthDate, user.hashedPassword);
       
       if (!isPasswordValid) {
@@ -131,6 +137,12 @@ export class AuthService {
       
       if (!user) {
         this.logger.warn(`User not found for JWT payload: ${payload.studentId}`);
+        return null;
+      }
+
+      // Check if user is banned during token validation
+      if (user.isBanned) {
+        this.logger.warn(`Banned user token validation: ${payload.studentId}`);
         return null;
       }
 

@@ -22,6 +22,21 @@ export class User {
 
   @Prop({ default: 0 })
   loginCount: number;
+
+  @Prop({ default: false })
+  isBanned: boolean;
+
+  @Prop()
+  bannedReason?: string;
+
+  @Prop()
+  bannedAt?: Date;
+
+  @Prop()
+  bannedBy?: string;
+
+  @Prop({ enum: ['user', 'admin'], default: 'user' })
+  role: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

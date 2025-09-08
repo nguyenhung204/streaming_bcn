@@ -380,8 +380,26 @@
     <div class="container">
         <div class="main-content">
             <div class="header">
-                <h1>� LiveStream Chat - High Performance</h1>
+                <h1>🚀 LiveStream Chat - High Performance</h1>
                 <p>✨ Message Buffer System với Batch Processing cho 500+ users</p>
+                <div style="margin-top: 15px;">
+                    <a href="/dashboard.html" target="_blank" style="
+                        background: linear-gradient(45deg, #667eea, #764ba2);
+                        color: white;
+                        padding: 10px 20px;
+                        border-radius: 25px;
+                        text-decoration: none;
+                        font-weight: bold;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 8px;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+                    " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(102, 126, 234, 0.4)'" 
+                       onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(102, 126, 234, 0.3)'">
+                        ⚙️ Admin Dashboard
+                    </a>
+                </div>
             </div>
             
             <div id="connectionStatus" class="connection-status disconnected">
@@ -498,12 +516,12 @@
     <script>
         // ==================== CONFIG ====================
         // 🔧 DEVELOPMENT CONFIG (Local Testing)
-        const API_BASE_URL = 'http://localhost:3001';
-        const WS_URL = 'ws://localhost:3001';
+        // const API_BASE_URL = 'http://localhost:3001';
+        // const WS_URL = 'ws://localhost:3001';
 
         // 🚀 PRODUCTION CONFIG (Uncomment when deploying)
-        // const API_BASE_URL = 'https://stream.bancongnghe.tech';
-        // const WS_URL = 'wss://stream.bancongnghe.tech';
+        const API_BASE_URL = 'https://stream.bancongnghe.tech';
+        const WS_URL = 'wss://stream.bancongnghe.tech';
         
         let socket = null;
         let currentRoom = null;
