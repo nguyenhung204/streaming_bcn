@@ -24,6 +24,24 @@ services:
       retries: 3
       start_period: 40s
 
+  # Init Service - Setup data and admin user  
+  init:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: livestream_init
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://${MONGODB_ROOT_USER:-admin}:${MONGODB_ROOT_PASSWORD:-admin123}@mongodb:27017/stream_socket?authSource=admin
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - app-network
+    command: ["./scripts/docker-init.sh"]
+    restart: "no"  # Init service should only run once
+
   # NestJS Application (Direct access without nginx)
   app:
     build:
@@ -39,14 +57,12 @@ services:
       - MONGODB_URI=mongodb://${MONGODB_ROOT_USER:-admin}:${MONGODB_ROOT_PASSWORD:-admin123}@mongodb:27017/stream_socket?authSource=admin
       - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
       - SESSION_SECRET=${SESSION_SECRET:-your-super-secret-session-key-change-in-production}
-    depends_on:
-      mongodb:
-        condition: service_healthy
     restart: unless-stopped
     networks:
       - app-network
     volumes:
       - app_logs:/app/logs
+    command: ["node", "./dist/main.js"]
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/api/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
       interval: 30s

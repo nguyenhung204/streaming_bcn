@@ -2,6 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../app.module';
 import { AuthService } from '../services/auth.service';
 import { Logger } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { User, UserDocument } from '../schemas/user.schema';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -11,13 +14,15 @@ interface MemberData {
   birthDate: string;
 }
 
-async function importMembers() {
+async function importAndSetup() {
   const app = await NestFactory.createApplicationContext(AppModule);
   const authService = app.get(AuthService);
-  const logger = new Logger('ImportMembers');
+  const logger = new Logger('ImportAndSetup');
 
   try {
-    // Read members data
+    // Step 1: Import members data
+    logger.log('🚀 Starting combined import and setup process...');
+    
     const membersPath = path.join(process.cwd(), 'members-list-final.json');
     
     if (!fs.existsSync(membersPath)) {
@@ -27,8 +32,8 @@ async function importMembers() {
 
     const membersData: MemberData[] = JSON.parse(fs.readFileSync(membersPath, 'utf8'));
 
-    logger.log(`Found ${membersData.length} members to import...`);
-    logger.log(`File: ${membersPath}`);
+    logger.log(`📥 Found ${membersData.length} members to import...`);
+    logger.log(`📁 File: ${membersPath}`);
 
     let imported = 0;
     let skipped = 0;
@@ -95,13 +100,64 @@ async function importMembers() {
     console.log(`📈 Total processed: ${imported + skipped + failed}/${membersData.length} users`);
     
     if (imported > 0) {
-      console.log(`\n🎉 Import completed successfully!`);
-      console.log(`💡 Users can now login with their studentId and birthDate (DDMMYY format)`);
+      console.log(`\n🎉 Members import completed successfully!`);
+    } else {
+      console.log(`\n✨ All members already exist in database`);
     }
 
+    // Step 2: Create admin user
+    console.log('\n👑 Creating admin user...');
+    
+    // Admin user data
+    const adminData = {
+      studentId: 'admin001',
+      fullName: 'System Administrator',
+      birthDate: '01/01/2000', // Default admin password
+      role: 'admin'
+    };
+
+    // Check if admin already exists
+    const existingAdmin = await authService.getUserByStudentId(adminData.studentId);
+    if (existingAdmin) {
+      console.log(`✅ Admin user ${adminData.studentId} already exists!`);
+      
+      // Update role if needed
+      const userModel = app.get('UserModel') as Model<UserDocument>;
+      await userModel.updateOne(
+        { studentId: adminData.studentId },
+        { role: 'admin' }
+      );
+      console.log('🔄 Updated role to admin');
+      
+    } else {
+      // Create new admin user
+      const hashedPassword = await authService.hashPassword(adminData.birthDate);
+      
+      const userModel = app.get('UserModel') as Model<UserDocument>;
+      const adminUser = new userModel({
+        studentId: adminData.studentId,
+        fullName: adminData.fullName,
+        hashedPassword: hashedPassword,
+        role: 'admin',
+        isActive: true,
+        loginCount: 0,
+      });
+
+      await adminUser.save();
+      console.log('✅ Admin user created successfully!');
+    }
+
+    console.log('\n📋 Admin Login Credentials:');
+    console.log(`👤 Student ID: ${adminData.studentId}`);
+    console.log(`🔑 Password (Birth Date): ${adminData.birthDate}`);
+    console.log(`🎯 Role: admin`);
+    console.log('\n💡 Users can login with their studentId and birthDate (DDMMYY format)');
+    console.log('🎯 You can now login with admin credentials to access admin dashboard.');
+
   } catch (error) {
-    console.error('💥 Import failed with error:', error);
+    console.error('💥 Setup failed with error:', error);
     console.error('Stack trace:', error.stack);
+    throw error;
   } finally {
     await app.close();
     console.log('\n🔌 Application context closed');
@@ -120,15 +176,15 @@ process.on('uncaughtException', (error) => {
 });
 
 // Run the import with better error handling
-console.log('🚀 Starting members import process...');
+console.log('🚀 Starting combined import and setup process...');
 console.log(`⏰ Started at: ${new Date().toISOString()}`);
 
-importMembers()
+importAndSetup()
   .then(() => {
-    console.log(`✅ Import process completed at: ${new Date().toISOString()}`);
+    console.log(`✅ Setup process completed at: ${new Date().toISOString()}`);
     process.exit(0);
   })
   .catch((error) => {
-    console.error('💥 Import process failed:', error);
+    console.error('💥 Setup process failed:', error);
     process.exit(1);
   });
