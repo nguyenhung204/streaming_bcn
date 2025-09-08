@@ -1,12 +1,16 @@
 import { Controller, Post, Body, HttpCode, HttpStatus, Get, Param, Res, Req, UseGuards } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { AuthService, LoginDto, AuthResult } from '../services/auth.service';
+import { CookieConfigService } from '../services/cookie-config.service';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { CurrentUser, AuthenticatedUser } from '../decorators/current-user.decorator';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly cookieConfigService: CookieConfigService,
+  ) {}
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
@@ -16,15 +20,8 @@ export class AuthController {
   ): Promise<AuthResult> {
     const result = await this.authService.login(loginDto);
     
-    // Set JWT token in cookie with 6 hours expiration
-    const cookieOptions = {
-      httpOnly: true, // Prevent XSS attacks
-      secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-      sameSite: 'strict' as const, // CSRF protection
-      maxAge: 6 * 60 * 60 * 1000, // 6 hours in milliseconds
-      path: '/', // Available for entire site
-    };
-
+    // Set JWT token in cookie using centralized configuration
+    const cookieOptions = this.cookieConfigService.getTokenCookieOptions();
     response.cookie('access_token', result.access_token, cookieOptions);
     
     return result;
@@ -33,13 +30,9 @@ export class AuthController {
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   async logout(@Res({ passthrough: true }) response: Response) {
-    // Clear the cookie
-    response.clearCookie('access_token', {
-      path: '/',
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-    });
+    // Clear the cookie using centralized configuration
+    const clearOptions = this.cookieConfigService.getClearCookieOptions();
+    response.clearCookie('access_token', clearOptions);
     
     return { message: 'Logged out successfully' };
   }

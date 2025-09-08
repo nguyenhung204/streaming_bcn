@@ -15,6 +15,10 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   
+  // Log the configured log level
+  const logLevel = configService.get<string>('LOG_LEVEL', 'info');
+  logger.log(`Configured log level: ${logLevel}`);
+  
   // Enable cookie parser
   app.use(cookieParser());
   

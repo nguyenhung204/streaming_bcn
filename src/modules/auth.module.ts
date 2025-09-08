@@ -4,6 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from '../controllers/auth.controller';
 import { AuthService } from '../services/auth.service';
+import { CookieConfigService } from '../services/cookie-config.service';
 import { User, UserSchema } from '../schemas/user.schema';
 
 @Module({
@@ -14,14 +15,14 @@ import { User, UserSchema } from '../schemas/user.schema';
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET') || 'your-secret-key-change-in-production',
         signOptions: { 
-          expiresIn: '6h', // 6 hours
+          expiresIn: configService.get<string>('JWT_EXPIRES_IN', '6h'),
         },
       }),
       inject: [ConfigService],
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
-  exports: [AuthService, JwtModule],
+  providers: [AuthService, CookieConfigService],
+  exports: [AuthService, CookieConfigService, JwtModule],
 })
 export class AuthModule {}

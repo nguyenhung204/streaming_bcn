@@ -6,13 +6,12 @@ export interface ChatMessageDto {
 
 export interface JoinRoomDto {
   roomId: string;
-  userId: string;
-  username: string;
+  // userId and username will be extracted from authenticated user
 }
 
 export interface LeaveRoomDto {
   roomId: string;
-  userId: string;
+  // userId will be extracted from authenticated user
 }
 
 export interface ChatMessageResponse {
@@ -33,7 +32,6 @@ export interface RoomStatsDto {
 
 export interface UserTypingDto {
   roomId: string;
-  userId: string;
-  username: string;
   isTyping: boolean;
+  // userId and username will be extracted from authenticated user
 }

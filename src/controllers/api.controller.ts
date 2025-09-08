@@ -10,6 +10,8 @@ import {
 } from '@nestjs/common';
 import { ChatService } from '../services/chat.service';
 import { SessionManager } from '../services/session-manager.service';
+import { ResponseUtil } from '../utils/response.util';
+import { ErrorHandler } from '../utils/error-handler.util';
 
 interface CreateRoomDto {
   roomId: string;
@@ -54,61 +56,50 @@ export class ApiController {
   @Post('rooms')
   @HttpCode(HttpStatus.CREATED)
   async createRoom(@Body() createRoomDto: CreateRoomDto) {
-    try {
+    return ErrorHandler.handle(async () => {
       const { roomId, title, hostId, hostName } = createRoomDto;
       
       const room = await this.chatService.createRoom(roomId, title, hostId, hostName);
       
       this.logger.log(`Room created: ${roomId} by ${hostName}`);
       
-      return {
-        success: true,
-        data: room,
-      };
-    } catch (error) {
-      this.logger.error(`Error creating room: ${error.message}`);
-      return {
-        success: false,
-        error: error.message,
-      };
-    }
+      return ResponseUtil.success(room, 'Room created successfully');
+    }, {
+      logger: this.logger,
+      context: 'Error creating room',
+      defaultValue: ResponseUtil.error('Failed to create room'),
+    });
   }
 
   @Get('rooms/:roomId')
   async getRoomInfo(@Param('roomId') roomId: string) {
-    try {
+    return ErrorHandler.handle(async () => {
       const roomInfo = await this.chatService.getRoomInfo(roomId);
       if (!roomInfo) {
-        return {
-          success: false,
-          error: 'Room not found',
-        };
+        return ResponseUtil.error('Room not found');
       }
 
       const sessionStats = await this.sessionManager.getRoomStats(roomId);
       
-      return {
-        success: true,
-        data: {
-          roomId: roomInfo.roomId,
-          title: roomInfo.title,
-          hostId: roomInfo.hostId,
-          hostName: roomInfo.hostName,
-          viewerCount: roomInfo.viewerCount,
-          isActive: roomInfo.isActive,
-          startTime: roomInfo.startTime,
-          settings: roomInfo.settings,
-          currentUsers: sessionStats?.userCount || 0,
-          messageCount: sessionStats?.messageCount || 0,
-        },
+      const data = {
+        roomId: roomInfo.roomId,
+        title: roomInfo.title,
+        hostId: roomInfo.hostId,
+        hostName: roomInfo.hostName,
+        viewerCount: roomInfo.viewerCount,
+        isActive: roomInfo.isActive,
+        startTime: roomInfo.startTime,
+        settings: roomInfo.settings,
+        currentUsers: sessionStats?.userCount || 0,
+        messageCount: sessionStats?.messageCount || 0,
       };
-    } catch (error) {
-      this.logger.error(`Error getting room info: ${error.message}`);
-      return {
-        success: false,
-        error: error.message,
-      };
-    }
+
+      return ResponseUtil.success(data);
+    }, {
+      logger: this.logger,
+      context: 'Error getting room info',
+      defaultValue: ResponseUtil.error('Failed to get room info'),
+    });
   }
 
   @Get('rooms/:roomId/messages')

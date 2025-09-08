@@ -1,9 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../app.module';
 import { AuthService } from '../services/auth.service';
+import { Logger } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as bcrypt from 'bcrypt';
 
 interface MemberData {
   fullName: string;
@@ -11,28 +11,24 @@ interface MemberData {
   birthDate: string;
 }
 
-async function hashPassword(plainPassword: string): Promise<string> {
-  const saltRounds = 10;
-  return await bcrypt.hash(plainPassword, saltRounds);
-}
-
 async function importMembers() {
   const app = await NestFactory.createApplicationContext(AppModule);
   const authService = app.get(AuthService);
+  const logger = new Logger('ImportMembers');
 
   try {
     // Read members data
     const membersPath = path.join(process.cwd(), 'members-list-final.json');
     
     if (!fs.existsSync(membersPath)) {
-      console.error(`❌ Members file not found: ${membersPath}`);
+      logger.error(`Members file not found: ${membersPath}`);
       return;
     }
 
     const membersData: MemberData[] = JSON.parse(fs.readFileSync(membersPath, 'utf8'));
 
-    console.log(`🔍 Found ${membersData.length} members to import...`);
-    console.log(`📁 File: ${membersPath}`);
+    logger.log(`Found ${membersData.length} members to import...`);
+    logger.log(`File: ${membersPath}`);
 
     let imported = 0;
     let skipped = 0;

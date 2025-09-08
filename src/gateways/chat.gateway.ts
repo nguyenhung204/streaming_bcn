@@ -12,29 +12,26 @@ import { Logger, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from '../services/chat.service';
 import { SessionManager } from '../services/session-manager.service';
+import { AppConfigService } from '../config/app-config.service';
 import {
   ChatMessageDto,
   JoinRoomDto,
   LeaveRoomDto,
   UserTypingDto,
 } from '../dto/chat.dto';
+import { WsAuth } from '../decorators/ws-auth.decorator';
+import { WsCurrentUser, WsUser } from '../decorators/ws-current-user.decorator';
+import { WsAuthMiddleware } from '../middleware/ws-auth.middleware';
 
 @WebSocketGateway({
   cors: {
-    origin: [
-      'http://127.0.0.1:5500',
-      'http://localhost:5500', 
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'https://stream.bancongnghe.tech',
-      process.env.CORS_ORIGIN
-    ].filter(Boolean),
+    origin: [], // Will be set in constructor
     credentials: true,
   },
   transports: ['websocket'],
   allowEIO3: true,
-  pingTimeout: 60000,
-  pingInterval: 25000,
+  pingTimeout: 60000, // Will be overridden in constructor
+  pingInterval: 25000, // Will be overridden in constructor
 })
 @UsePipes(new ValidationPipe())
 export class ChatGateway
@@ -50,15 +47,22 @@ export class ChatGateway
   constructor(
     private readonly chatService: ChatService,
     private readonly sessionManager: SessionManager,
+    private readonly appConfig: AppConfigService,
+    private readonly wsAuthMiddleware: WsAuthMiddleware,
   ) {
     // Cleanup inactive users every 5 minutes
     setInterval(async () => {
-      await this.sessionManager.cleanupInactiveUsers();
-    }, 5 * 60 * 1000);
+      await this.sessionManager.cleanupInactiveUsers(this.appConfig.inactiveThreshold);
+    }, this.appConfig.sessionCleanupInterval);
   }
 
   afterInit(server: Server) {
     this.logger.log('WebSocket Gateway initialized');
+    
+    // Apply authentication middleware to all socket connections
+    server.use((socket, next) => {
+      this.wsAuthMiddleware.use(socket, next);
+    });
     
     // Configure Socket.IO for high performance
     server.engine.generateId = () => {
@@ -69,7 +73,16 @@ export class ChatGateway
 
   async handleConnection(client: Socket) {
     try {
-      this.logger.log(`Client connected: ${client.id}`);
+      const user = client.data.user;
+      
+      // Check if user data exists
+      if (!user) {
+        this.logger.error(`No user data found for socket ${client.id}`);
+        client.disconnect();
+        return;
+      }
+
+      this.logger.log(`Client connected: ${client.id} - User: ${user.studentId} (${user.fullName})`);
       
       // Check if this is a reconnection by looking for existing user session
       const existingSession = await this.sessionManager.getUserBySocketId(client.id);
@@ -80,7 +93,11 @@ export class ChatGateway
       client.emit('connected', { 
         message: 'Connected to chat server',
         timestamp: new Date().toISOString(),
-        socketId: client.id
+        socketId: client.id,
+        user: {
+          studentId: user.studentId,
+          fullName: user.fullName,
+        }
       });
     } catch (error) {
       this.logger.error(`Connection error: ${error.message}`);
@@ -118,18 +135,23 @@ export class ChatGateway
     }
   }
 
+  @WsAuth()
   @SubscribeMessage('joinRoom')
   async handleJoinRoom(
     @MessageBody() data: JoinRoomDto,
     @ConnectedSocket() client: Socket,
+    @WsCurrentUser() user: WsUser,
   ) {
     try {
-      const { roomId, userId, username } = data;
+      const { roomId } = data;
 
-      if (!roomId || !userId || !username) {
+      if (!roomId) {
         client.emit('error', { message: 'Invalid room data' });
         return;
       }
+
+      // Use authenticated user data instead of client-provided data
+      const { userId, fullName: username } = user;
 
       // Add user to room
       await this.sessionManager.addUserToRoom(client.id, userId, username, roomId);
@@ -172,13 +194,16 @@ export class ChatGateway
     }
   }
 
+  @WsAuth()
   @SubscribeMessage('leaveRoom')
   async handleLeaveRoom(
     @MessageBody() data: LeaveRoomDto,
     @ConnectedSocket() client: Socket,
+    @WsCurrentUser() user: WsUser,
   ) {
     try {
-      const { roomId, userId } = data;
+      const { roomId } = data;
+      const { userId } = user;
       
       await client.leave(roomId);
       
@@ -206,10 +231,12 @@ export class ChatGateway
     }
   }
 
+  @WsAuth()
   @SubscribeMessage('sendMessage')
   async handleMessage(
     @MessageBody() data: ChatMessageDto,
     @ConnectedSocket() client: Socket,
+    @WsCurrentUser() user: WsUser,
   ) {
     try {
       // Rate limiting check
@@ -233,6 +260,18 @@ export class ChatGateway
       }
 
       const { userId, username, roomId } = userSession;
+      
+      // Verify that the authenticated user matches the session user
+      if (user.userId !== userId) {
+        this.logger.warn(`User ID mismatch: token=${user.userId}, session=${userId}`);
+        client.emit('error', { 
+          message: 'Authentication mismatch. Please refresh and rejoin.',
+          code: 'AUTH_MISMATCH',
+          requireReconnect: true
+        });
+        return;
+      }
+      
       this.logger.debug(`Message from user ${username} (${userId}) in room ${roomId}`);
 
       const { message, type = 'text' } = data;
@@ -285,10 +324,12 @@ export class ChatGateway
     }
   }
 
+  @WsAuth()
   @SubscribeMessage('typing')
   async handleTyping(
     @MessageBody() data: UserTypingDto,
     @ConnectedSocket() client: Socket,
+    @WsCurrentUser() user: WsUser,
   ) {
     try {
       const userSession = await this.sessionManager.getUserBySocketId(client.id);
@@ -297,7 +338,8 @@ export class ChatGateway
         return;
       }
 
-      const { roomId, userId, username, isTyping } = data;
+      const { roomId, isTyping } = data;
+      const { userId, fullName: username } = user;
 
       if (isTyping) {
         await this.addUserToTyping(roomId, userId);
@@ -322,8 +364,12 @@ export class ChatGateway
     }
   }
 
+  @WsAuth()
   @SubscribeMessage('getRoomStats')
-  async handleGetRoomStats(@ConnectedSocket() client: Socket) {
+  async handleGetRoomStats(
+    @ConnectedSocket() client: Socket,
+    @WsCurrentUser() user: WsUser,
+  ) {
     try {
       const userSession = await this.sessionManager.getUserBySocketId(client.id);
       if (!userSession) {

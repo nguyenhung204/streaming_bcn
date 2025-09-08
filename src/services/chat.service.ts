@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { ChatMessage, ChatMessageDocument } from '../schemas/chat-message.schema';
 import { LiveRoom, LiveRoomDocument } from '../schemas/live-room.schema';
 import { MessageBufferService } from './message-buffer.service';
+import { ErrorHandler } from '../utils/error-handler.util';
 
 @Injectable()
 export class ChatService {
@@ -54,16 +55,17 @@ export class ChatService {
    * Get recent messages from memory buffer (super fast)
    */
   getRecentMessages(roomId: string, limit: number = 50): any[] {
-    try {
+    return ErrorHandler.handleSync(() => {
       // Get from in-memory buffer for maximum performance
       const messages = this.messageBufferService.getRecentMessages(roomId, limit);
       
       this.logger.debug(`Retrieved ${messages.length} messages from buffer for room ${roomId}`);
       return messages;
-    } catch (error) {
-      this.logger.error(`Error fetching messages from buffer: ${error.message}`);
-      return [];
-    }
+    }, {
+      logger: this.logger,
+      context: 'Error fetching messages from buffer',
+      defaultValue: [],
+    });
   }
 
   async createRoom(
@@ -97,14 +99,15 @@ export class ChatService {
   }
 
   async updateViewerCount(roomId: string, count: number): Promise<void> {
-    try {
+    return ErrorHandler.handle(async () => {
       await this.liveRoomModel.updateOne(
         { roomId },
         { viewerCount: count }
       );
-    } catch (error) {
-      this.logger.error(`Error updating viewer count: ${error.message}`);
-    }
+    }, {
+      logger: this.logger,
+      context: 'Error updating viewer count',
+    });
   }
 
   async getRoomInfo(roomId: string): Promise<LiveRoom> {

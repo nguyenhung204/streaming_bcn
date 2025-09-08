@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ErrorHandler } from '../utils/error-handler.util';
 
 interface UserSession {
   userId: string;
@@ -32,56 +33,64 @@ export class SessionManager {
     username: string,
     roomId: string
   ): Promise<void> {
-    try {
-      // Remove user from previous room if exists
-      await this.removeUserFromAllRooms(userId);
+    return ErrorHandler.handle(
+      async () => {
+        // Remove user from previous room if exists
+        await this.removeUserFromAllRooms(userId);
 
-      const userSession: UserSession = {
-        userId,
-        username,
-        socketId,
-        roomId,
-        joinTime: new Date(),
-        lastActivity: new Date(),
-      };
+        const userSession: UserSession = {
+          userId,
+          username,
+          socketId,
+          roomId,
+          joinTime: new Date(),
+          lastActivity: new Date(),
+        };
 
-      // Store session
-      this.userSessions.set(socketId, userSession);
-      this.userRooms.set(userId, roomId);
-      
-      // Add to room
-      if (!this.roomUsers.has(roomId)) {
-        this.roomUsers.set(roomId, new Set());
+        // Store session
+        this.userSessions.set(socketId, userSession);
+        this.userRooms.set(userId, roomId);
+        
+        // Add to room
+        if (!this.roomUsers.has(roomId)) {
+          this.roomUsers.set(roomId, new Set());
+        }
+        this.roomUsers.get(roomId)!.add(userId);
+
+        this.logger.log(`User ${username} joined room ${roomId} with socket ${socketId}`);
+      },
+      {
+        logger: this.logger,
+        context: 'Error adding user to room',
       }
-      this.roomUsers.get(roomId)!.add(userId);
-
-      this.logger.log(`User ${username} joined room ${roomId} with socket ${socketId}`);
-    } catch (error) {
-      this.logger.error(`Error adding user to room: ${error.message}`);
-    }
+    );
   }
 
   async removeUserFromRoom(socketId: string): Promise<UserSession | null> {
-    try {
-      const userSession = this.userSessions.get(socketId);
-      if (!userSession) return null;
+    return ErrorHandler.handle(
+      async () => {
+        const userSession = this.userSessions.get(socketId);
+        if (!userSession) return null;
 
-      const { userId, roomId, username } = userSession;
+        const { userId, roomId, username } = userSession;
 
-      // Remove from all storages
-      this.userSessions.delete(socketId);
-      this.userRooms.delete(userId);
-      this.roomUsers.get(roomId)?.delete(userId);
-      
-      // Remove from typing if was typing
-      this.typingUsers.get(roomId)?.delete(userId);
+        // Remove from all storages
+        this.userSessions.delete(socketId);
+        this.userRooms.delete(userId);
+        this.roomUsers.get(roomId)?.delete(userId);
+        
+        // Remove from typing if was typing
+        this.typingUsers.get(roomId)?.delete(userId);
 
-      this.logger.log(`User ${username} left room ${roomId}`);
-      return userSession;
-    } catch (error) {
-      this.logger.error(`Error removing user from room: ${error.message}`);
-      return null;
-    }
+        this.logger.log(`User ${username} left room ${roomId}`);
+        return userSession;
+      },
+      {
+        logger: this.logger,
+        context: 'Error removing user from room',
+        defaultValue: null,
+      }
+    );
   }
 
   async removeUserFromAllRooms(userId: string): Promise<void> {
@@ -219,49 +228,57 @@ export class SessionManager {
 
   // Cleanup inactive users (called periodically)
   async cleanupInactiveUsers(inactiveThresholdMs: number = 300000): Promise<void> { // 5 minutes
-    try {
-      const now = new Date();
-      const sessionsToRemove: string[] = [];
-      
-      for (const [socketId, session] of this.userSessions.entries()) {
-        if (now.getTime() - session.lastActivity.getTime() > inactiveThresholdMs) {
-          sessionsToRemove.push(socketId);
+    return ErrorHandler.handle(
+      async () => {
+        const now = new Date();
+        const sessionsToRemove: string[] = [];
+        
+        for (const [socketId, session] of this.userSessions.entries()) {
+          if (now.getTime() - session.lastActivity.getTime() > inactiveThresholdMs) {
+            sessionsToRemove.push(socketId);
+          }
         }
+        
+        for (const socketId of sessionsToRemove) {
+          await this.removeUserFromRoom(socketId);
+        }
+        
+        this.logger.log(`Cleaned up ${sessionsToRemove.length} inactive sessions`);
+      },
+      {
+        logger: this.logger,
+        context: 'Error cleaning up inactive users',
       }
-      
-      for (const socketId of sessionsToRemove) {
-        await this.removeUserFromRoom(socketId);
-      }
-      
-      this.logger.log(`Cleaned up ${sessionsToRemove.length} inactive sessions`);
-    } catch (error) {
-      this.logger.error(`Error cleaning up inactive users: ${error.message}`);
-    }
+    );
   }
 
   // Rate limiting methods
   private rateLimitMap: Map<string, number[]> = new Map();
   
   async checkRateLimit(socketId: string, maxRequests: number = 30, windowMs: number = 60000): Promise<boolean> {
-    try {
-      const now = Date.now();
-      const requests = this.rateLimitMap.get(socketId) || [];
-      
-      // Remove old requests
-      const recentRequests = requests.filter(time => now - time < windowMs);
-      
-      if (recentRequests.length >= maxRequests) {
-        return false;
+    return ErrorHandler.handle(
+      async () => {
+        const now = Date.now();
+        const requests = this.rateLimitMap.get(socketId) || [];
+        
+        // Remove old requests
+        const recentRequests = requests.filter(time => now - time < windowMs);
+        
+        if (recentRequests.length >= maxRequests) {
+          return false;
+        }
+        
+        recentRequests.push(now);
+        this.rateLimitMap.set(socketId, recentRequests);
+        
+        return true;
+      },
+      {
+        logger: this.logger,
+        context: 'Error checking rate limit',
+        defaultValue: true, // Allow on error
       }
-      
-      recentRequests.push(now);
-      this.rateLimitMap.set(socketId, recentRequests);
-      
-      return true;
-    } catch (error) {
-      this.logger.error(`Error checking rate limit: ${error.message}`);
-      return true; // Allow on error
-    }
+    );
   }
 
   // Typing users management
