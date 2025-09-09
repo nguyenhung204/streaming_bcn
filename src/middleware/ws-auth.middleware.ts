@@ -44,7 +44,10 @@ export class WsAuthMiddleware {
         payload,
       };
 
-      this.logger.debug(`Socket ${socket.id} authenticated as ${user.studentId}`);
+      // Only log on first authentication, not on every message
+      if (!socket.data.user) {
+        this.logger.log(`Socket ${socket.id} authenticated as ${user.studentId}`);
+      }
       next();
     } catch (error) {
       this.logger.error(`WebSocket authentication middleware failed: ${error.message}`);
@@ -60,14 +63,9 @@ export class WsAuthMiddleware {
    * 3. Cookie: access_token=jwt_token
    */
   private extractTokenFromSocket(socket: Socket): string | null {
-    // Debug: Log all handshake info
-    this.logger.debug(`Socket handshake query: ${JSON.stringify(socket.handshake.query)}`);
-    this.logger.debug(`Socket handshake headers: ${JSON.stringify(socket.handshake.headers)}`);
-    
     // Try to get token from query parameters
     const queryToken = socket.handshake.query.token;
     if (queryToken && typeof queryToken === 'string') {
-      this.logger.debug(`Found token in query parameter`);
       return queryToken;
     }
 
@@ -76,27 +74,22 @@ export class WsAuthMiddleware {
     if (authHeader && typeof authHeader === 'string') {
       const [type, token] = authHeader.split(' ');
       if (type === 'Bearer' && token) {
-        this.logger.debug(`Found token in Authorization header`);
         return token;
       }
     }
 
     // Try to get token from cookies
     const cookies = socket.handshake.headers.cookie;
-    this.logger.debug(`Raw cookies: ${cookies}`);
     if (cookies) {
       const cookieArray = cookies.split(';');
       for (const cookie of cookieArray) {
         const [name, value] = cookie.trim().split('=');
-        this.logger.debug(`Checking cookie: ${name} = ${value}`);
         if (name === 'access_token' && value) {
-          this.logger.debug(`Found token in cookie`);
           return value;
         }
       }
     }
 
-    this.logger.warn(`No token found in any source`);
     return null;
   }
 }

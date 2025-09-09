@@ -20,7 +20,6 @@ import {
   LeaveRoomDto,
   UserTypingDto,
 } from '../dto/chat.dto';
-import { WsAuth } from '../decorators/ws-auth.decorator';
 import { WsCurrentUser, WsUser } from '../decorators/ws-current-user.decorator';
 import { WsAuthMiddleware } from '../middleware/ws-auth.middleware';
 
@@ -153,7 +152,6 @@ export class ChatGateway
     }
   }
 
-  @WsAuth()
   @SubscribeMessage('joinRoom')
   async handleJoinRoom(
     @MessageBody() data: JoinRoomDto,
@@ -212,7 +210,6 @@ export class ChatGateway
     }
   }
 
-  @WsAuth()
   @SubscribeMessage('leaveRoom')
   async handleLeaveRoom(
     @MessageBody() data: LeaveRoomDto,
@@ -249,7 +246,6 @@ export class ChatGateway
     }
   }
 
-  @WsAuth()
   @SubscribeMessage('sendMessage')
   async handleMessage(
     @MessageBody() data: ChatMessageDto,
@@ -369,7 +365,6 @@ export class ChatGateway
     }
   }
 
-  @WsAuth()
   @SubscribeMessage('typing')
   async handleTyping(
     @MessageBody() data: UserTypingDto,
@@ -409,7 +404,6 @@ export class ChatGateway
     }
   }
 
-  @WsAuth()
   @SubscribeMessage('getRoomStats')
   async handleGetRoomStats(
     @ConnectedSocket() client: Socket,
