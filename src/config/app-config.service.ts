@@ -67,7 +67,8 @@ export class AppConfigService {
     return [
       'https://stream.bancongnghe.tech',
       'http://127.0.0.1:5500',
-      'http://localhost:5500', 
+      'http://localhost:5500',
+      'https://study.bancongnghe.tech',
       'http://localhost:3000',
       'http://localhost:3001',
       this.configService.get<string>('CORS_ORIGIN')
