@@ -110,12 +110,29 @@ export class ChatService {
     });
   }
 
-  async getRoomInfo(roomId: string): Promise<LiveRoom> {
+  async getRoomInfo(roomId: string): Promise<LiveRoom | null> {
     try {
-      return await this.liveRoomModel.findOne({ roomId, isActive: true });
+      const room = await this.liveRoomModel.findOne({ roomId, isActive: true });
+      
+      if (!room) {
+        this.logger.warn(`Room not found or not active: ${roomId}`);
+        return null;
+      }
+      
+      return room;
     } catch (error) {
       this.logger.error(`Error getting room info: ${error.message}`);
       throw error;
+    }
+  }
+
+  async roomExists(roomId: string): Promise<boolean> {
+    try {
+      const room = await this.liveRoomModel.findOne({ roomId, isActive: true });
+      return !!room;
+    } catch (error) {
+      this.logger.error(`Error checking if room exists: ${error.message}`);
+      return false;
     }
   }
 

@@ -688,7 +688,29 @@
 
             socket.on('error', (error) => {
                 console.error('Socket error:', error);
-                updateConnectionStatus(false, `Lỗi: ${error.message}`);
+                
+                // Handle specific error codes
+                if (error.code === 'ROOM_NOT_FOUND') {
+                    alert('Phòng không tồn tại hoặc đã đóng!\n\nVui lòng kiểm tra lại mã phòng hoặc liên hệ với người tạo phòng.');
+                    
+                    // Reset join room form
+                    const joinButton = document.getElementById('joinRoomButton');
+                    if (joinButton) {
+                        joinButton.disabled = false;
+                        joinButton.textContent = '🚀 Tham gia phòng chat';
+                    }
+                    
+                    // Show join form, hide chat
+                    document.getElementById('chatJoinForm').style.display = 'block';
+                    document.getElementById('chatContainer').style.display = 'none';
+                    
+                    currentRoom = null;
+                    currentUser = null;
+                    
+                    updateConnectionStatus(false, 'Phòng không tồn tại');
+                } else {
+                    updateConnectionStatus(false, `Lỗi: ${error.message}`);
+                }
             });
 
             // Chat events
@@ -875,7 +897,7 @@
             updateConnectionStatus(false, '🚪 Đã đăng xuất');
         }
 
-        function joinRoom() {
+        async function joinRoom() {
             if (!authenticatedUser) {
                 alert('⚠️ Vui lòng đăng nhập trước!');
                 return;
@@ -889,47 +911,65 @@
 
             const joinButton = document.getElementById('joinRoomButton');
             joinButton.disabled = true;
-            joinButton.textContent = '⏳ Đang tham gia...';
+            joinButton.textContent = '⏳ Đang kiểm tra...';
 
-            currentRoom = roomId;
-            currentUser = {
-                userId: 'user_' + Math.random().toString(36).substr(2, 9),
-                username: authenticatedUser.fullName,
-                studentId: authenticatedUser.studentId
-            };
-
-            // Make sure socket is connected
-            if (!socket || !socket.connected) {
-                initializeSocket();
-                setTimeout(() => {
-                    socket.emit('joinRoom', { roomId, userId: currentUser.userId, username: currentUser.username });
-                }, 1000);
-            } else {
-                socket.emit('joinRoom', { roomId, userId: currentUser.userId, username: currentUser.username });
-            }
-
-            // Hide join form, show chat
-            document.getElementById('chatJoinForm').style.display = 'none';
-            document.getElementById('chatContainer').style.display = 'flex';
-            
-            // Enable message input (backup - will also be enabled by socket event)
-            setTimeout(() => {
-                const messageInput = document.getElementById('messageInput');
-                const sendButton = document.getElementById('sendButton');
+            try {
+                // Check if room exists before attempting to join
+                const response = await fetch(`/api/rooms/${roomId}/exists`);
+                const result = await response.json();
                 
-                if (messageInput && sendButton) {
-                    messageInput.disabled = false;
-                    messageInput.placeholder = 'Nhập tin nhắn...';
-                    sendButton.disabled = false;
-                    messageInput.focus();
+                if (!result.success || !result.data.exists) {
+                    alert('❌ Phòng không tồn tại hoặc đã đóng!\n\nVui lòng kiểm tra lại mã phòng hoặc liên hệ với người tạo phòng.');
+                    joinButton.disabled = false;
+                    joinButton.textContent = '🚀 Tham gia phòng chat';
+                    return;
                 }
-            }, 1500);
-            
-            // Start timer
-            startTime = Date.now();
-            
-            joinButton.disabled = false;
-            joinButton.textContent = '🚀 Tham gia phòng chat';
+
+                // Room exists, proceed to join
+                joinButton.textContent = '⏳ Đang tham gia...';
+
+                currentRoom = roomId;
+                currentUser = {
+                    userId: 'user_' + Math.random().toString(36).substr(2, 9),
+                    username: authenticatedUser.fullName,
+                    studentId: authenticatedUser.studentId
+                };
+
+                // Make sure socket is connected
+                if (!socket || !socket.connected) {
+                    initializeSocket();
+                    setTimeout(() => {
+                        socket.emit('joinRoom', { roomId, userId: currentUser.userId, username: currentUser.username });
+                    }, 1000);
+                } else {
+                    socket.emit('joinRoom', { roomId, userId: currentUser.userId, username: currentUser.username });
+                }
+
+                // Hide join form, show chat
+                document.getElementById('chatJoinForm').style.display = 'none';
+                document.getElementById('chatContainer').style.display = 'flex';
+                
+                // Enable message input (backup - will also be enabled by socket event)
+                setTimeout(() => {
+                    const messageInput = document.getElementById('messageInput');
+                    const sendButton = document.getElementById('sendButton');
+                    
+                    if (messageInput && sendButton) {
+                        messageInput.disabled = false;
+                        messageInput.placeholder = 'Nhập tin nhắn...';
+                        sendButton.disabled = false;
+                    }
+                    
+                    joinButton.disabled = false;
+                    joinButton.textContent = '🚀 Tham gia phòng chat';
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Error checking room:', error);
+                alert('❌ Không thể kiểm tra phòng!\n\nVui lòng thử lại sau hoặc kiểm tra kết nối mạng.');
+                joinButton.disabled = false;
+                joinButton.textContent = '🚀 Tham gia phòng chat';
+            }
         }
 
         function leaveRoom() {

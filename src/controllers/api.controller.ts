@@ -142,6 +142,23 @@ export class ApiController {
     }
   }
 
+  @Get('rooms/:roomId/exists')
+  async checkRoomExists(@Param('roomId') roomId: string) {
+    return ErrorHandler.handle(async () => {
+      const exists = await this.chatService.roomExists(roomId);
+      
+      return ResponseUtil.success({ 
+        roomId,
+        exists,
+        timestamp: new Date().toISOString()
+      }, exists ? 'Room exists' : 'Room not found');
+    }, {
+      logger: this.logger,
+      context: 'Error checking room existence',
+      defaultValue: ResponseUtil.error('Failed to check room existence'),
+    });
+  }
+
   @Post('rooms/:roomId/end')
   @HttpCode(HttpStatus.OK)
   async endRoom(@Param('roomId') roomId: string) {

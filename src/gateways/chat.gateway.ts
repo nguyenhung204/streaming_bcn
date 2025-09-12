@@ -166,6 +166,17 @@ export class ChatGateway
         return;
       }
 
+      // Check if room exists and is active before allowing to join
+      const roomInfo = await this.chatService.getRoomInfo(roomId);
+      if (!roomInfo) {
+        client.emit('error', { 
+          message: 'Room not found or not active',
+          code: 'ROOM_NOT_FOUND'
+        });
+        this.logger.warn(`User ${user.fullName} tried to join non-existent room: ${roomId}`);
+        return;
+      }
+
       // Use authenticated user data instead of client-provided data
       const { userId, fullName: username } = user;
 
@@ -177,9 +188,6 @@ export class ChatGateway
 
       // Get recent messages
       const recentMessages = this.chatService.getRecentMessages(roomId, 100);
-      
-      // Get room info
-      const roomInfo = await this.chatService.getRoomInfo(roomId);
       
       // Send room data to user
       client.emit('joinedRoom', {
