@@ -56,7 +56,6 @@ services:
       - PORT=3001
       - MONGODB_URI=mongodb://${MONGODB_ROOT_USER:-admin}:${MONGODB_ROOT_PASSWORD:-admin123}@mongodb:27017/stream_socket?authSource=admin
       - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
-      - SESSION_SECRET=${SESSION_SECRET:-your-super-secret-session-key-change-in-production}
     restart: unless-stopped
     networks:
       - app-network
