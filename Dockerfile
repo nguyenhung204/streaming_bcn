@@ -67,7 +67,7 @@ COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
 # Copy necessary files
 COPY --chown=nestjs:nodejs package.json ./
 COPY --chown=nestjs:nodejs public ./public
-COPY --chown=nestjs:nodejs members-list-final.json ./
+COPY --chown=nestjs:nodejs accounts.json ./
 COPY --chown=nestjs:nodejs scripts/docker-init.sh ./scripts/
 COPY --chown=nestjs:nodejs src ./src
 
